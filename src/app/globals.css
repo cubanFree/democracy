@@ -83,6 +83,10 @@ body {
   background-color: #0d0f10;
 }
 
+.bg-green-origin {
+  background-image: linear-gradient(to bottom, #404540, #2f322f);
+}
+
 .bg-sub-origin {
   background-color: #1a1a1a;
 }
