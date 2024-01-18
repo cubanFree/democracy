@@ -60,7 +60,7 @@ export default function FooterBar() {
                                     <TooltipTrigger>
                                         <Link 
                                             href={link.path}
-                                            className={"hover:text-gray-500" + (path === link.path ? ' text-gray-500' : '')}
+                                            className={"hover:text-gray-500" + (path === link.path ? ' text-gray-500 animate-pulse' : '')}
                                             onClick={() => setPath(link.path)}
                                             >
                                                 <link.icon size={link.size}/>

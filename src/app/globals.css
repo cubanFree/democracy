@@ -86,3 +86,12 @@ body {
 .bg-sub-origin {
   background-color: #1a1a1a;
 }
+
+@keyframes spin {
+  to {
+      transform: rotate(360deg);
+  }
+}
+.animate-spin {
+  animation: spin 5s linear infinite;
+}

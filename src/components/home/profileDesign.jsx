@@ -35,7 +35,7 @@ export default async function ProfileDesign() {
                     alt="avatar_profile" 
                     width={40} 
                     height={40} 
-                    className="rounded-lg ml-4 hover:cursor-pointer object-cover"
+                    className="rounded-lg hover:cursor-pointer object-cover w-8 h-8"
                 />
             </DropdownMenuTrigger>
 

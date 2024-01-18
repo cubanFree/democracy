@@ -22,6 +22,7 @@ import React, { useEffect } from 'react';
 import { loginWithPassword, signupWithPassword } from '@/lib/action';
 import { useRouter } from 'next/navigation';
 import RegisterCard from './registerCard';
+import { toast } from "sonner"
 
 export default function FormAuth() {
 
@@ -52,7 +53,7 @@ export default function FormAuth() {
     // handling action signUp
     const handleSignUp = async (formData) => {
         const { error } = await signupWithPassword(location.origin, formData)
-        if (error) return console.error(error)
+        if (error) return toast.error(error)
         setIsVisibleEmail('')
         setIsVisiblePass('')
         showPass && setShowPass(false)
@@ -61,14 +62,14 @@ export default function FormAuth() {
         setIsValidData(false)
         refCheckbox.current?.setAttribute('data-state', 'unchecked')
         refInputName.current.value = ''
-        console.log('Verify your email to continue')
+        toast.success('Verify your email to continue')
     }
 
     // handling action signIn
     const router = useRouter()
     const handleSignIn = async (formData) => {
         const { error } = await loginWithPassword(formData)
-        if (error) return console.error(error)
+        if (error) return toast.error(error)
         setIsVisibleEmail('')
         setIsVisiblePass('')
         showPass && setShowPass(false)

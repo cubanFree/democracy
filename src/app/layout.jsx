@@ -1,7 +1,8 @@
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { VscServerProcess } from "react-icons/vsc";
-import { Alert, AlertCancel, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Toaster } from '@/components/ui/sonner';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -25,6 +26,7 @@ export default async function RootLayout({ children }) {
             </AlertDescription>
           </Alert>
           {children}
+          <Toaster />
       </body>
     </html>
   )

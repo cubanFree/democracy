@@ -64,7 +64,7 @@ export default function RegisterCard(
                       alt="Avatar Profile"
                       width={200}
                       height={200}
-                      className="rounded-3xl border border-gray-500 p-1 object-cover cursor-pointer"
+                      className="rounded-3xl border border-gray-500 p-1 object-cover cursor-pointer w-52 h-32"
                   />
                   <input
                       disabled={isDisabled}

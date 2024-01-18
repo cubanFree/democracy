@@ -1,8 +1,8 @@
-import MainBar from '@/components/home/mainBar';
-
 export default function Home() {
 
     return (
-        <MainBar />
+        <main className="flex items-center justify-center h-full">
+            <h1>Aqui es donde va todo el mapa del usuario.</h1>
+        </main>
     )
 }
