@@ -1,5 +1,6 @@
 'use client';
 
+import { changeStatus } from "@/lib/action";
 import { Button } from "../ui/button";
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
@@ -15,9 +16,14 @@ export default function BtnSignOut() {
         setPending(true);
         try {
             const supabase = createClientComponentClient();
+
+            const { error: errorStatus } = await changeStatus();
+            if (errorStatus) throw new Error(errorStatus.message);
+
             const { error } = await supabase.auth.signOut({ scope: 'global' });
             if (error) throw new Error(error.message);
             router.push('/');
+            
         } catch (error) {
             console.error(error);
             setPending(false);

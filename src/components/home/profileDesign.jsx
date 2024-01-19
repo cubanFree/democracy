@@ -6,11 +6,13 @@ import BtnSignOut from "./btnSignOut";
 import Link from "next/link";
 import { AiOutlineUser } from "react-icons/ai";
 import { IoSettingsOutline } from "react-icons/io5";
+import { fetchProfileData } from "@/lib/data";
 
 export default async function ProfileDesign() {
 
     const supabase = createServerComponentClient({ cookies });
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data } = await fetchProfileData(user?.id, 'users', ['avatar_url']);
 
     const allLists = [
         {
@@ -31,7 +33,7 @@ export default async function ProfileDesign() {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Image 
-                    src={session.user?.user_metadata?.avatar_url || '/avatar_default.jpg'} 
+                    src={data?.avatar_url || '/avatar_default.jpg'} 
                     alt="avatar_profile" 
                     width={40} 
                     height={40} 

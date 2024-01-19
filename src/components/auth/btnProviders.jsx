@@ -1,21 +1,29 @@
 'use client';
 
+import { changeStatus } from "@/lib/action";
 import { Button } from "../ui/button";
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { toast } from 'sonner';
 
 export default function BtnGithub() {
 
     const handleSignInGithub = async () => {
         const supabase = createClientComponentClient();
         try {
-            await supabase.auth.signInWithOAuth({
+            const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'github',
                 options: {
                   redirectTo: `${location.origin}/auth/callback`
                 }
             });
+            if (error) throw new Error(error.message);
+
+            const { error: errorStatus } = await changeStatus('online');
+            if (errorStatus) throw new Error(errorStatus.message);
+
         } catch (error) {
-            console.error(error);
+            console.error('[ ERROR btnGithub ]', error);
+            toast.error(error.message)
         }
     };
 
@@ -39,14 +47,20 @@ export function BtnGmail() {
     const handleSignInGoogle = async () => {
         const supabase = createClientComponentClient();
         try {
-            await supabase.auth.signInWithOAuth({
+            const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
                   redirectTo: `${location.origin}/auth/callback`
                 }
             });
+            if (error) throw new Error(error.message);
+
+            const { error: errorStatus } = await changeStatus('online');
+            if (errorStatus) throw new Error(errorStatus.message);
+
         } catch (error) {
-            console.error(error);
+            console.error('[ ERROR btnGmail ]', error);
+            toast.error(error.message)
         }
     }
 

@@ -18,6 +18,9 @@ export async function loginWithPassword(formData) {
         })
         if (error) throw new Error(error.message);
 
+        const { error: errorStatus } = await changeStatus('online');
+        if (errorStatus) throw new Error(errorStatus.message);
+
         return { error: null };
 
     } catch (error) {
@@ -81,5 +84,20 @@ export async function removeUserProfile() {
     } catch (error) {
         console.error('[ ERROR removeUserProfile ]', error);
         return { error: error.message };
+    }
+}
+
+export async function changeStatus(status = 'offline') {
+    const supabase = createServerActionClient({ cookies });
+    try {
+        // cambiar status de usuario en la base de datos
+        const { data: { user } } = await supabase.auth.getUser();
+        const { error } = user && await supabase.from('users').update({ status }).eq('id', user.id);
+        if (error) throw new Error(error.message);
+
+        return { error: null };
+    } catch (error) {
+        console.error('[ ERROR changeStatus ]', error);
+        return { error };
     }
 }
