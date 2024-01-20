@@ -54,6 +54,8 @@ export default function FormAuth() {
     const handleSignUp = async (formData) => {
         const { error } = await signupWithPassword(location.origin, formData)
         if (error) return toast.error(error)
+
+        // resetear todos los valores del Form
         setIsVisibleEmail('')
         setIsVisiblePass('')
         showPass && setShowPass(false)
@@ -62,6 +64,8 @@ export default function FormAuth() {
         setIsValidData(false)
         refCheckbox.current?.setAttribute('data-state', 'unchecked')
         refInputName.current.value = ''
+
+        // mostrar mensaje
         toast.success('Verify your email to continue')
     }
 
@@ -70,9 +74,13 @@ export default function FormAuth() {
     const handleSignIn = async (formData) => {
         const { error } = await loginWithPassword(formData)
         if (error) return toast.error(error)
+
+        // resetear todos los valores del Form
         setIsVisibleEmail('')
         setIsVisiblePass('')
         showPass && setShowPass(false)
+
+        // refrescar la pagina
         router.refresh()
     }
 

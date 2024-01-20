@@ -9,7 +9,7 @@ export default function layout({ children }) {
                 <HeaderBar />
             </div>
 
-            <div className="flex-grow w-full overflow-auto sm:px-[10%]">
+            <div className="flex-grow overflow-auto sm:mx-[10%]">
                 <ErrorDebounce>
                     {children}
                 </ErrorDebounce>

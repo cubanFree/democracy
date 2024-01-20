@@ -16,15 +16,15 @@ export async function loginWithPassword(formData) {
             email,
             password
         })
-        if (error) throw new Error(error.message);
+        if (error) throw new Error(error);
 
         const { error: errorStatus } = await changeStatus('online');
-        if (errorStatus) throw new Error(errorStatus.message);
+        if (errorStatus) throw new Error(errorStatus);
 
         return { error: null };
 
     } catch (error) {
-        console.error('[ ERROR login ]', error);
+        console.error('[ ERROR login ]', error.message);
         return { error: error.message };
     }
 }
@@ -44,10 +44,10 @@ export async function signupWithPassword(path, formData) {
             upsert: true,
             contentType: avatar.type
         });
-        if (avatarError) throw new Error(avatarError.message);
+        if (avatarError) throw new Error(avatarError);
 
         // Obtener la URL-token de la imagen de perfil
-        const signedUrl = (avatar?.size > 0) ? await supabase.storage.from('avatar_profile').createSignedUrl(email, 1000000).then(res => res.data?.signedUrl) : process.env.URL_AVATAR_DEFAULT;
+        const signedUrl = (avatar?.size > 0) ? await supabase.storage.from('avatar_profile').createSignedUrl(email, 1000000).then(res => res.data?.signedUrl) : null;
         
         // Sign up
         const { error } = await supabase.auth.signUp({
@@ -61,13 +61,16 @@ export async function signupWithPassword(path, formData) {
                 }
             }
         })
-        if (error) throw new Error(error.message);
+        if (error) throw new Error(error);
 
         return { error: null };
 
     } catch (error) {
-        await supabase.storage.from('avatar_profile').remove([email]);
-        console.error('[ ERROR signup ]', error);
+        // eliminar el avatar del storage si ocurre algun error en la registracion
+        const { error: removeError } = await supabase.storage.from('avatar_profile').remove([email]);
+        if (removeError) console.error('[ ERROR removeAvatar_url ]', removeError.message);
+
+        console.error('[ ERROR signup ]', error.message);
         return { error: error.message };
     }
 }
@@ -87,17 +90,25 @@ export async function removeUserProfile() {
     }
 }
 
-export async function changeStatus(status = 'offline') {
+export async function changeStatus(status) {
     const supabase = createServerActionClient({ cookies });
+    
     try {
-        // cambiar status de usuario en la base de datos
         const { data: { user } } = await supabase.auth.getUser();
-        const { error } = user && await supabase.from('users').update({ status }).eq('id', user.id);
-        if (error) throw new Error(error.message);
+        if (!user) throw new Error('User not found');
+
+        // checkear si esta en null
+        const { data } = await supabase.from('users').select('status').eq('id', user.id);
+
+        // cambiar status de usuario en la base de datos en caso de que el usuario haga privado su estatus
+        if (data[0].status !== null) {
+            const { error } = await supabase.from('users').update({ status }).eq('id', user.id);
+            if (error) throw new Error(error);
+        }
 
         return { error: null };
     } catch (error) {
-        console.error('[ ERROR changeStatus ]', error);
+        console.error('[ ERROR changeStatus ]', error.message);
         return { error };
     }
 }

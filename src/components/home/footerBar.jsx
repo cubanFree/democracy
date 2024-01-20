@@ -50,7 +50,7 @@ export default function FooterBar() {
 
     return (
         <nav className="w-full h-full border-t border-gray-700">
-            <ul className="flex h-full justify-center items-center gap-8 sm:px-[10%]">
+            <ul className="flex h-full justify-center items-center gap-8 sm:mx-[10%]">
                 {
                     allLinks.map((link) => (
                         <li key={link.name}>

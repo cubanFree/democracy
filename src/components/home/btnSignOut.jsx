@@ -17,7 +17,7 @@ export default function BtnSignOut() {
         try {
             const supabase = createClientComponentClient();
 
-            const { error: errorStatus } = await changeStatus();
+            const { error: errorStatus } = await changeStatus('offline');
             if (errorStatus) throw new Error(errorStatus.message);
 
             const { error } = await supabase.auth.signOut({ scope: 'global' });

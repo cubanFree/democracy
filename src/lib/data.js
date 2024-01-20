@@ -18,7 +18,7 @@ export async function checkUsernameExists(username) {
         return { data: data?.length ? true : false, error: null };
 
     } catch (error) {
-        console.error('[ ERROR checkUsernameExists ]', error);
+        console.error('[ ERROR checkUsernameExists ]', error.message);
         return { data: false, error: error.message };
     }
 }

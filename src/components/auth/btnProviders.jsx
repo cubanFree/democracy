@@ -16,13 +16,10 @@ export default function BtnGithub() {
                   redirectTo: `${location.origin}/auth/callback`
                 }
             });
-            if (error) throw new Error(error.message);
-
-            const { error: errorStatus } = await changeStatus('online');
-            if (errorStatus) throw new Error(errorStatus.message);
+            if (error) throw new Error(error);
 
         } catch (error) {
-            console.error('[ ERROR btnGithub ]', error);
+            console.error('[ ERROR btnGithub ]', error.message);
             toast.error(error.message)
         }
     };
@@ -53,13 +50,10 @@ export function BtnGmail() {
                   redirectTo: `${location.origin}/auth/callback`
                 }
             });
-            if (error) throw new Error(error.message);
-
-            const { error: errorStatus } = await changeStatus('online');
-            if (errorStatus) throw new Error(errorStatus.message);
+            if (error) throw new Error(error);
 
         } catch (error) {
-            console.error('[ ERROR btnGmail ]', error);
+            console.error('[ ERROR btnGmail ]', error.message);
             toast.error(error.message)
         }
     }
