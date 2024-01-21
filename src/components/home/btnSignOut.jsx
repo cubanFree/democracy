@@ -31,7 +31,7 @@ export default function BtnSignOut() {
     };
 
     return (
-        <Button onClick={signOut} size="sm" variant="destructive" className="w-full mt-2">
+        <Button onClick={signOut} size="sm" variant="destructive" className="w-full">
             {
                 pending ? 'Please wait...' : 'Sign out'
             }

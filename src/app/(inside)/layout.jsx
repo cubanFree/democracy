@@ -1,6 +1,7 @@
 import ErrorDebounce from "@/components/general/errorDebounce";
 import FooterBar from "@/components/home/footerBar";
 import HeaderBar from "@/components/home/headerBar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function layout({ children }) {
     return (
@@ -9,13 +10,13 @@ export default function layout({ children }) {
                 <HeaderBar />
             </div>
 
-            <div className="flex-grow overflow-auto sm:mx-[10%]">
+            <ScrollArea className="flex-grow overflow-auto sm:mx-[10%] dark">
                 <ErrorDebounce>
                     {children}
                 </ErrorDebounce>
-            </div>
+            </ScrollArea>
 
-            <div className="w-full h-20">
+            <div className="w-full min-h-16">
                 <FooterBar />
             </div>
         </main>

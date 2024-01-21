@@ -66,7 +66,7 @@ export default async function CaseProfile() {
                     width={1000}
                     height={1000}
                     priority
-                    className={cn("object-cover w-16 h-16 rounded-xl lg:rounded-3xl lg:w-28 lg:h-28 lg:mx-auto", 
+                    className={cn("object-cover w-16 h-16 rounded-xl sticky top-2 lg:sticky lg:top-auto lg:rounded-3xl lg:w-28 lg:h-28 lg:mx-auto", 
                         dataUser?.status === 'online' ? 'border-4 border-transparent ring-2 ring-green-700' : dataUser?.status === 'offline' ? 'border-4 border-transparent ring-2 ring-red-900' : 'border-4 border-transparent ring-2 ring-gray-500'
                     )}
                 />

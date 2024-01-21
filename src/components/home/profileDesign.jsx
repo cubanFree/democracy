@@ -1,4 +1,4 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import Image from "next/image";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
@@ -41,17 +41,16 @@ export default async function ProfileDesign() {
                 />
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent className="w-50 bg-origin border border-gray-500 shadow-md-2xl text-gray-300">
-                <DropdownMenuLabel className="text-sm font-bold">My Account</DropdownMenuLabel>
+            <DropdownMenuContent className="flex flex-col gap-2 w-50 bg-origin border border-gray-500 shadow-md-2xl text-gray-300">
 
-                <DropdownMenuGroup className="border-y border-gray-600">
+                <DropdownMenuGroup className="border-b border-gray-600">
                     {
                         allLists.map((list, index) => (
                             <Link 
                                 href={list.href}
                                 key={index}
                                 >
-                                    <DropdownMenuItem className="flex justify-start items-center gap-2 cursor-pointer">
+                                    <DropdownMenuItem className="flex justify-start items-center gap-2 cursor-pointer p-3">
                                         <list.icon size={list.size} className={list.name === 'Settings' ? 'animate-spin' : ''}/>
                                         {list.name}
                                     </DropdownMenuItem>

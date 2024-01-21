@@ -6,12 +6,13 @@ import { Button } from '../ui/button';
 class ErrorDebounce extends Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, errorMessage: '' };
   }
 
   static getDerivedStateFromError(error) {
     // Actualiza el estado para que el siguiente renderizado muestre la interfaz de reserva
-    return { hasError: true };
+    // e incluye el mensaje de error
+    return { hasError: true, errorMessage: error.message || 'Un error desconocido ha ocurrido' };
   }
 
   componentDidCatch(error, errorInfo) {
@@ -21,15 +22,16 @@ class ErrorDebounce extends Component {
 
   refreshPage = () => {
     window.location.reload();
-}
+  }
 
   render() {
     if (this.state.hasError) {
-      // Puedes renderizar cualquier interfaz de reserva personalizada
+      // Renderiza la interfaz de reserva con el mensaje de error
       return (
         <div className='flex flex-col justify-center items-center gap-2 h-full'>
-          <h1>Something went wrong.</h1>
-          <Button onClick={this.refreshPage} className='dark'>Try again</Button>
+          <span className='text-lg'>Something went wrong.</span>
+          <span className='text-md'>{this.state.errorMessage}</span> {/* Muestra el mensaje de error */}
+          <Button onClick={this.refreshPage}>Try again</Button>
         </div>
       );
     }
@@ -39,4 +41,3 @@ class ErrorDebounce extends Component {
 }
 
 export default ErrorDebounce;
-
