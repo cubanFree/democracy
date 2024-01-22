@@ -23,7 +23,7 @@ export default async function ProfileDesign() {
         },
         {
             name: 'Settings',
-            href: '/settings',
+            href: '/setting',
             icon: IoSettingsOutline,
             size: 20
         }

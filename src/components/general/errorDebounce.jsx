@@ -30,7 +30,7 @@ class ErrorDebounce extends Component {
       return (
         <div className='flex flex-col justify-center items-center gap-2 h-full'>
           <span className='text-lg'>Something went wrong.</span>
-          <span className='text-md'>{this.state.errorMessage}</span> {/* Muestra el mensaje de error */}
+          <span className='text-md text-red-400'>{this.state.errorMessage}</span> {/* Muestra el mensaje de error */}
           <Button onClick={this.refreshPage}>Try again</Button>
         </div>
       );

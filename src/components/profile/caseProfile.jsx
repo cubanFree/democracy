@@ -6,6 +6,9 @@ import { cn } from "@/lib/utils";
 import { MdOutlineDateRange } from "react-icons/md";
 import { DropdownMenuSeparator } from "../ui/dropdown-menu";
 import moment from "moment/moment";
+import { Dialog } from "@radix-ui/react-dialog";
+import { DialogContent, DialogTrigger } from "../ui/dialog";
+import AvatarConf from "./avatar-conf";
 
 export default async function CaseProfile() {
 
@@ -60,16 +63,8 @@ export default async function CaseProfile() {
     return (
         <main className="w-full gap-4">
             <div className="w-full flex gap-4 lg:gap-2 lg:flex-col">
-                <Image 
-                    src={dataUser?.avatar_url || '/avatar_default.jpg'}
-                    alt="avatar profile"
-                    width={1000}
-                    height={1000}
-                    priority
-                    className={cn("object-cover w-16 h-16 rounded-xl sticky top-2 lg:sticky lg:top-auto lg:rounded-3xl lg:w-28 lg:h-28 lg:mx-auto", 
-                        dataUser?.status === 'online' ? 'border-4 border-transparent ring-2 ring-green-700' : dataUser?.status === 'offline' ? 'border-4 border-transparent ring-2 ring-red-900' : 'border-4 border-transparent ring-2 ring-gray-500'
-                    )}
-                />
+                <AvatarConf avatar_url={dataUser?.avatar_url} status={dataUser?.status}/>
+                
                 <div className="w-full flex flex-col items-start gap-3 lg:items-center">
                     <div className="flex-wrap justify-center gap-2 items-center sm:flex">
                         <span className="text-xl font-bold text-center lg:text-2xl">{dataUser?.user_name || 'Unknown'}</span>
@@ -92,7 +87,7 @@ export default async function CaseProfile() {
 
                     {/* Information about */}
                     <div className="w-full flex flex-col items-start text-sm">
-                        <em className="font-bold text-yellow-600"><strong>Information about</strong></em>
+                        <span className="font-bold text-yellow-600"><strong>Information about</strong></span>
                         <div className="w-full flex flex-col pl-[10%] gap-2 border border-gray-800 rounded-md p-2">
                             <span><strong>Citizenship:</strong> <span className="fond-light text-gray-400">{citizenship?.data?.name || 'N/A'}</span></span>
                             <span><strong>Residenceship:</strong> <span className="fond-light text-gray-400">{residenceship?.data?.name || 'N/A'}</span></span>
@@ -105,7 +100,7 @@ export default async function CaseProfile() {
 
                     {/* Company information */}
                     <div className="w-full flex flex-col items-start text-sm">
-                        <em className="font-bold text-yellow-600"><strong>Company information</strong></em>
+                        <span className="font-bold text-yellow-600"><strong>Company information</strong></span>
                         <div className="w-full flex flex-col pl-[10%] gap-2 border border-gray-800 rounded-md p-2">
 
                             {/* directors */}

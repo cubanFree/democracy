@@ -24,7 +24,7 @@ export default function FooterBar() {
         },
         {
             name: 'warehouse',
-            path: '/warehouse',
+            path: '/warehouse/summaries',
             icon: LuWarehouse,
             size: 30
         },
