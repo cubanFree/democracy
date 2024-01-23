@@ -1,14 +1,20 @@
 import { fetchProfileData } from "@/lib/data";
-import Image from "next/image";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { cn } from "@/lib/utils";
-import { MdOutlineDateRange } from "react-icons/md";
+import { MdOutlineDateRange, MdOutlineLocationOn } from "react-icons/md";
 import { DropdownMenuSeparator } from "../ui/dropdown-menu";
 import moment from "moment/moment";
-import { Dialog } from "@radix-ui/react-dialog";
-import { DialogContent, DialogTrigger } from "../ui/dialog";
 import AvatarConf from "./avatar-conf";
+import { IoEarth } from "react-icons/io5";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { FaBuildingWheat } from "react-icons/fa6"; // icono de empresa beginner
+import { FaBuildingCircleExclamation } from "react-icons/fa6"; // icono de con riesgos
+import { FaBuildingCircleXmark } from "react-icons/fa6"; // icono de empresa en banca rota
+import { FaBuildingCircleCheck } from "react-icons/fa6"; // icono de empresa sin riesgos
+import { FaBuildingShield } from "react-icons/fa6"; // icono de empresa segura
+import { RiGovernmentLine } from "react-icons/ri"; // icono de governador del pais
+import { HiOutlineIdentification } from "react-icons/hi2"; // icono de identidad
 
 export default async function CaseProfile() {
 
@@ -42,109 +48,86 @@ export default async function CaseProfile() {
     const { data: dataAbout, error: errorAbout } = await fetchProfileData(user?.id, 'info_about', ['ranking_local', 'ranking_global', 'rating']);
     if (errorAbout) throw new Error('ERROR 500: something goes wrong when getting Information About.');
 
-    // fetching informacion de la Compania
-    const { data: dataCompany, error: errorCompany } = await fetchProfileData(user?.id, 'info_management', 
-        ['directors', 
-        'employees_workers', 
-        'employees_administration', 
-        'administrative_expenses', 
-        'bonus_production_speed', 
-        'bonus_sales_speed', 
-        'company_valuation', 
-        'infrastructure_valuation', 
-        'patents_valuation', 
-        'liabilities_bonds_sold', 
-        'liabilities_interest_payment']);
-    if (errorCompany) throw new Error('ERROR 500: something goes wrong when getting Information Company.');
-
     // convertir fecha de creacion
     const dataPerfil = moment(dataUser?.created_at).fromNow();
+
+    // lista de los rankings
+    const listsRanking = [
+        { name: 'Ranking local', value: dataAbout?.ranking_local, icon: MdOutlineLocationOn, size: 20},
+        { name: 'Ranking global', value: dataAbout?.ranking_global, icon: IoEarth, size: 20},
+    ]
 
     return (
         <main className="w-full gap-4">
             <div className="w-full flex gap-4 lg:gap-2 lg:flex-col">
                 <AvatarConf avatar_url={dataUser?.avatar_url} status={dataUser?.status}/>
                 
-                <div className="w-full flex flex-col items-start gap-3 lg:items-center">
-                    <div className="flex-wrap justify-center gap-2 items-center sm:flex">
-                        <span className="text-xl font-bold text-center lg:text-2xl">{dataUser?.user_name || 'Unknown'}</span>
-                        <span className="text-gray-500 text-sm flex justify-center items-center gap-2">
-                            <span className="text-gray-500">•</span>
-                            <MdOutlineDateRange size={17} />
-                            <span>{dataPerfil}</span>
-                        </span>
+                <div className="w-full flex flex-col items-start gap-2 lg:items-center">
+
+                    {/* nombre y roles */}
+                    <span className="flex gap-2 justify-center items-center text-xl font-bold text-center lg:text-2xl">
+                        {dataUser?.user_name || 'Unknown'}
+                        {
+                            dataUser?.roles.includes('beginner')
+                                ? <FaBuildingWheat size={15} color="green"/> 
+                                : null
+                        }
+                    </span>
+
+                    {/* fecha de creacion */}
+                    <span className="text-gray-500 text-sm flex justify-center items-center gap-2">
+                        <MdOutlineDateRange size={20} />
+                        joined {dataPerfil}
+                    </span>
+
+                    {/* citizenship */}
+                    <span className="flex justify-center items-center gap-2 text-gray-400">
+                        <HiOutlineIdentification size={20} />
+                        {citizenship?.data?.name || 'N/A'}
+                    </span>
+
+                    {/* lista de los rankings */}
+                    <div 
+                        className='w-full text-gray-400 flex gap-5 lg:justify-center'
+                        >
+                            {
+                                listsRanking.map((item, index) => (
+                                    <TooltipProvider key={index}>
+                                        <Tooltip>
+
+                                            <TooltipTrigger>
+                                                <span className="flex gap-1 items-center justify-center cursor-default"><item.icon size={item.size} /> <strong>{item.value || 'N/A'}</strong></span>
+                                            </TooltipTrigger>
+
+                                            <TooltipContent className="bg-foreground text-black">
+                                                <p>{item.name}</p>
+                                            </TooltipContent>
+                                            
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                ))
+                            }
                     </div>
 
-                    <span 
-                        className={cn(
-                            'w-full',
-                            !dataUser?.description && 'text-gray-500 lg:text-center'
-                        )}
-                        >
-                            {dataUser?.description || 'no description'}
-                    </span>
+                    {/* description */}
+                    {
+                        dataUser?.description && (
+                            <span 
+                                className='w-full text-gray-500 lg:text-center'
+                                >
+                                    {dataUser?.description}
+                            </span>
+                        )
+                    }
+
                     <DropdownMenuSeparator  className="w-full hidden lg:bg-gray-800 lg:flex"/>
 
-                    {/* Information about */}
-                    <div className="w-full flex flex-col items-start text-sm">
-                        <span className="font-bold text-yellow-600"><strong>Information about</strong></span>
-                        <div className="w-full flex flex-col pl-[10%] gap-2 border border-gray-800 rounded-md p-2">
-                            <span><strong>Citizenship:</strong> <span className="fond-light text-gray-400">{citizenship?.data?.name || 'N/A'}</span></span>
-                            <span><strong>Residenceship:</strong> <span className="fond-light text-gray-400">{residenceship?.data?.name || 'N/A'}</span></span>
-                            <span><strong>Roles:</strong> <span className="fond-light text-gray-400">{dataUser?.roles || 'N/A'}</span></span>
-                            <span><strong>Ranking_local:</strong> <span className="fond-light text-gray-400"># {dataAbout?.ranking_local || 'N/A'}</span></span>
-                            <span><strong>Ranking_global:</strong> <span className="fond-light text-gray-400"># {dataAbout?.ranking_global || 'N/A'}</span></span>
-                            <span><strong>Rating:</strong> <span className="fond-light text-gray-400">{dataAbout?.rating || 'N/A'}</span></span>
-                        </div>
-                    </div>
+                    {/* Information about
+                    <div className="w-full flex flex-col gap-2 items-start text-sm">
+                        <span><strong>Residenceship:</strong> <span className="fond-light text-gray-400">{residenceship?.data?.name || 'N/A'}</span></span>
+                        <span><strong>Rating:</strong> <span className="fond-light text-gray-400">{dataAbout?.rating || 'N/A'}</span></span>
+                    </div> */}
 
-                    {/* Company information */}
-                    <div className="w-full flex flex-col items-start text-sm">
-                        <span className="font-bold text-yellow-600"><strong>Company information</strong></span>
-                        <div className="w-full flex flex-col pl-[10%] gap-2 border border-gray-800 rounded-md p-2">
-
-                            {/* directors */}
-                            <span><strong className="text-blue-500">Directors:</strong> <span className="fond-light text-gray-400">{dataCompany?.directors.length || 'not yet'}</span></span>
-
-                            {/* employees */}
-                            <span className="w-full flex-wrap">
-                                <strong className="text-blue-500">Employees</strong>
-                                <div className="w-full flex flex-col pl-[10%] gap-2">
-                                    <span><strong>Workers:</strong> <span className="fond-light text-gray-400">{dataCompany?.employees_workers || '0'}</span></span>
-                                    <span><strong>Administration:</strong> <span className="fond-light text-gray-400">{dataCompany?.employees_administration || '0'}</span></span>
-                                    <span><strong>Admin_expenses:</strong> <span className="fond-light text-gray-400">{dataCompany?.administrative_expenses || '0'}%</span></span>
-                                </div>
-                            </span>
-
-                            {/* bonus */}
-                            <span className="w-full flex-wrap">
-                                <strong className="text-blue-500">Bonus</strong>
-                                <div className="w-full flex flex-col pl-[10%] gap-2">
-                                    <span><strong>Production_speed:</strong> <span className="fond-light text-gray-400">{dataCompany?.bonus_production_speed || '0'}%</span></span>
-                                    <span><strong>Sales_speed:</strong> <span className="fond-light text-gray-400">{dataCompany?.bonus_sales_speed || '0'}%</span></span>
-                                </div>
-                            </span>
-
-                            {/* bonus */}
-                            <span className="w-full flex-wrap">
-                                <strong className="text-blue-500">Valuation</strong>
-                                <div className="w-full flex flex-col pl-[10%] gap-2">
-                                    <span><strong>Company:</strong> <span className="fond-light text-gray-400">${dataCompany?.company_valuation || '0'}</span></span>
-                                    <span><strong>Infrastructure:</strong> <span className="fond-light text-gray-400">${dataCompany?.infrastructure_valuation || '0'}</span></span>
-                                    <span><strong>Patents:</strong> <span className="fond-light text-gray-400">${dataCompany?.patents_valuation || '0'}</span></span>
-                                </div>
-                            </span>
-
-                            {/* passives */}
-                            <span className="w-full flex-wrap">
-                                <strong className="text-blue-500">Passives</strong>
-                                <div className="w-full flex flex-col pl-[10%] gap-2">
-                                    <span><strong>Bonds_sold:</strong> <span className="fond-light text-gray-400">${dataCompany?.liabilities_bonds_sold || '0'}</span></span>
-                                    <span><strong>Interest_payment:</strong> <span className="fond-light text-gray-400">${dataCompany?.liabilities_interest_payment || '0'} /day</span></span>
-                                </div>
-                            </span>
-                        </div>
-                    </div>
                 </div>
             </div>
 

@@ -1,5 +1,5 @@
 import ErrorDebounce from "@/components/general/errorDebounce";
-import CaseMap from "@/components/profile/caseMap";
+import CaseInfoManagement from "@/components/profile/caseManagement";
 import CaseProfile from "@/components/profile/caseProfile";
 import SkProfile from "@/components/skeleton/sk-profile";
 import { Suspense } from "react";
@@ -14,22 +14,25 @@ export default function Profile() {
                 </Suspense>
             </ErrorDebounce>
             
-            <div className="grid grid-rows-3 gap-4">
-                {/* Mostrar el mapa de la empresa */}
-                <CaseMap />
+            <div className="grid gap-4 md:grid-cols-2">
+                <ErrorDebounce>
+                    <Suspense fallback={<h3 className="w-full flex justify-center items-center h-full">Loading data Management...</h3>}>
+                        <CaseInfoManagement />
+                    </Suspense>
+                </ErrorDebounce>
 
-                {/* Mostrar las mediciones estadisticas de la empresa */}
-                <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-                    <div className="rounded-lg p-2 bg-green-origin shadow-lg">
-                        <h1>Estadisticas</h1>
+                <div className="grid gap-4 md:grid-rows-3">
+                    <div className="flex flex-col gap-4 rounded-xl p-2 bg-card shadow-lg">
+                        <h1>N/A</h1>
                     </div>
-                    <div className="rounded-lg p-2 bg-green-origin shadow-lg">
-                        <h1>Mapa</h1>
+                    <div className="flex flex-col gap-4 rounded-xl p-2 bg-card shadow-lg">
+                        <h1>N/A</h1>
                     </div>
-                    <div className="rounded-lg p-2 bg-green-origin shadow-lg">
-                        <h1>Trade</h1>
+                    <div className="flex flex-col gap-4 rounded-xl p-2 bg-card shadow-lg">
+                        <h1>N/A</h1>
                     </div>
                 </div>
+
             </div>
         </main>
     )
