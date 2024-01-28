@@ -78,7 +78,7 @@ export default function MenuDesign() {
                             key={index}
                             >
                                 <DropdownMenuItem
-                                    className="flex justify-start items-center gap-2 cursor-pointer"
+                                    className="flex justify-start items-center gap-2 cursor-pointer p-3"
                                     >
                                         <link.icon size={link.size}/>
                                         {link.name}

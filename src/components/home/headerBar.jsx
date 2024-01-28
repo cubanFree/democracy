@@ -35,7 +35,7 @@ export default function HeaderBar() {
 
     return (
         <nav className="w-full h-full border-b border-gray-700">
-            <ul className="flex h-full justify-between items-center text-md sm:mx-[10%]">
+            <ul className="flex h-full justify-between items-center text-md lg:mx-[10%]">
                 <li className="p-2">
                     <MenuDesign />
                 </li>

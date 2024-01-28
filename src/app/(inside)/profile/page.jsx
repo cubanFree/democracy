@@ -7,9 +7,9 @@ import { Suspense } from "react";
 export default function Profile() {
 
     return (
-        <main className="grid gap-4 h-full w-full p-2 lg:grid-cols-[2fr_5fr]">
+        <main className="grid gap-4 h-full w-full p-2 relative lg:grid-cols-[2fr_5fr]">
             <ErrorDebounce>
-                <Suspense fallback={<SkProfile />}>
+                <Suspense fallback={<SkProfile />} >
                     <CaseProfile />
                 </Suspense>
             </ErrorDebounce>

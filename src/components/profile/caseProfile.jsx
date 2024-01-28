@@ -32,7 +32,7 @@ export default async function CaseProfile() {
         'residenceship', 
         'roles', 
         'description']);
-    if (errorUser) throw new Error('ERROR 500: something goes wrong when getting Information Profile.');
+    if (errorUser) throw new Error('(Try refresh, else): It is recommended that you Log out, and then Log in. If it doesn`t work, please contact us or send a report.');
 
     // fetching citizenship y residenceship(si existe)
     const req1 = fetchProfileData(dataUser?.citizenship, 'countries', ['name']);
@@ -46,7 +46,7 @@ export default async function CaseProfile() {
 
     // fetching informacion del About
     const { data: dataAbout, error: errorAbout } = await fetchProfileData(user?.id, 'info_about', ['ranking_local', 'ranking_global', 'rating']);
-    if (errorAbout) throw new Error('ERROR 500: something goes wrong when getting Information About.');
+    if (errorAbout) throw new Error('(Try refresh, else): It is recommended that you Log out, and then Log in. If it doesn`t work, please contact us or send a report.');
 
     // convertir fecha de creacion
     const dataPerfil = moment(dataUser?.created_at).fromNow();

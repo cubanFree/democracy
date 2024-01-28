@@ -9,6 +9,7 @@ import { BiMessageSquareDetail } from "react-icons/bi";
 import React from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 export default function FooterBar() {
 
@@ -36,7 +37,7 @@ export default function FooterBar() {
         },
         {
             name: 'messages',
-            path: '/messages',
+            path: '/messages/inbox',
             icon: BiMessageSquareDetail,
             size: 30
         },
@@ -50,7 +51,7 @@ export default function FooterBar() {
 
     return (
         <nav className="w-full h-full border-t border-gray-700">
-            <ul className="flex h-full justify-center items-center gap-8 sm:mx-[10%]">
+            <ul className="flex h-full justify-center items-center gap-8 lg:mx-[10%]">
                 {
                     allLinks.map((link) => (
                         <li key={link.name}>
@@ -60,8 +61,11 @@ export default function FooterBar() {
                                     <TooltipTrigger>
                                         <Link 
                                             href={link.path}
-                                            className={"hover:text-gray-500" + (path === link.path ? ' text-gray-500 animate-pulse' : '')}
                                             onClick={() => setPath(link.path)}
+                                            className={cn(
+                                                "hover:text-gray-500",
+                                                (path === link.path ? ' text-gray-500 animate-pulse' : '')
+                                            )}
                                             >
                                                 <link.icon size={link.size}/>
                                         </Link>
