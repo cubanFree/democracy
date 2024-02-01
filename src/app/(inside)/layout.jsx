@@ -8,7 +8,7 @@ export default function layout({ children }) {
                 <HeaderBar />
             </div>
 
-            <div className="flex-grow h-full dark overflow-y-auto lg:mx-[10%]">
+            <div className="flex-grow h-full dark overflow-hidden lg:mx-[10%]">
                 <ErrorDebounce>
                     {children}
                 </ErrorDebounce>

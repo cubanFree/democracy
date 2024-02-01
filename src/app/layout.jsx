@@ -19,7 +19,7 @@ export default async function RootLayout({ children }) {
         <link rel="icon" type='image/png' href="/logo.png" />
       </head>
       <body className={inter.className + " text-gray-300 w-full h-screen overflow-x-hidden relative"}>
-          <Alert className="bg-yellow-600 flex justify-center gap-2 border-0 p-1 absolute top-0 z-50 sm:gap-4">
+          <Alert className="bg-yellow-600 flex justify-center gap-2 font-bold border-0 p-1 absolute top-0 z-50 sm:gap-4">
             <AlertTitle className="flex gap-2 items-center"><VscServerProcess size={25}/>Hey!</AlertTitle>
             <AlertDescription className="flex items-center mr-[9%] sm:mr-0">
               This is a game development in progress.

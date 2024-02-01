@@ -24,12 +24,12 @@ export default function SideBar({ pathList = [], className }) {
                             href={path.href}
                             onClick={() => setPath(path.href)}
                             className={cn(
-                                'flex justify-center items-center gap-2 px-4 md:cursor-pointer md:hover:bg-foreground md:hover:text-background lg:justify-start sm:p-3',
+                                'flex justify-start items-center gap-2 p-3 md:cursor-pointer md:hover:bg-foreground md:hover:text-background md:justify-center lg:justify-start',
                                 pathLoc === path.href ? 'text-blue-400' : '',
                                 )}
                             >
                                 <path.icon size={path.size} />
-                                <span className='hidden lg:flex'>{path.name}</span>
+                                <span className='flex md:hidden lg:flex'>{path.name}</span>
                         </Link>
                     ))
                 }

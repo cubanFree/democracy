@@ -76,6 +76,27 @@
   }
 }
 
+/* Estilo personalizado para la barra de desplazamiento */
+.scroll-custom {
+  @apply overflow-auto;
+}
+
+.scroll-custom::-webkit-scrollbar {
+  width: 5px; /* Ancho de la barra de desplazamiento */
+}
+
+.scroll-custom::-webkit-scrollbar-track {
+  @apply bg-sub-origin; /* Color de fondo de la pista */
+}
+
+.scroll-custom::-webkit-scrollbar-thumb {
+  @apply bg-gray-700 rounded; /* Color y forma del thumb */
+}
+
+.scroll-custom::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-700; /* Color del thumb al pasar el mouse */
+}
+
 * {
   font-family: 'JetBrains Mono', monospace;
 }
