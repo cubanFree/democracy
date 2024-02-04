@@ -14,9 +14,9 @@ export default function MenuBarMessages() {
             <div className="w-full flex justify-end md:hidden">
                 <Sheet>
                     <SheetTrigger><AiOutlineMenu size={25} /></SheetTrigger>
-                    <SheetContent className="bg-card border-gray-700 w-[15rem] overflow-y-auto">
+                    <SheetContent className="bg-card border-gray-700 w-[15rem] overflow-y-auto text-gray-300">
                         <SideBar 
-                            className='flex justify-start flex-col gap-4'
+                            className='flex justify-start flex-col gap-2'
                             pathList={[
                                 { name: 'Inbox', href: '/messages/inbox', icon: CiInboxIn, size: 25 },
                                 { name: 'Social', href: '/messages/social', icon: IoEarthOutline, size: 25 },

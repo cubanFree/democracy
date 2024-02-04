@@ -20,7 +20,7 @@ export default function MenuBarWarehouse() {
                     <SheetTrigger><AiOutlineMenu size={25} /></SheetTrigger>
                     <SheetContent className="bg-card border-gray-700 w-[15rem] overflow-y-auto">
                         <SideBar 
-                            className='flex justify-start flex-col gap-4'
+                            className='flex justify-start flex-col gap-2'
                             pathList={[
                                 { name: 'Summaries', href: '/warehouse/summaries', icon: MdOutlineSummarize, size: 25 },
                                 { name: 'Accounting', href: '/warehouse/accounting', icon: MdOutlineAccountBalanceWallet, size: 25 },

@@ -25,7 +25,7 @@ export default function SideBar({ pathList = [], className }) {
                             onClick={() => setPath(path.href)}
                             className={cn(
                                 'flex justify-start items-center gap-2 p-3 md:cursor-pointer md:hover:bg-foreground md:hover:text-background md:justify-center lg:justify-start',
-                                pathLoc === path.href ? 'text-blue-400' : '',
+                                pathLoc === path.href ? 'text-blue-300' : '',
                                 )}
                             >
                                 <path.icon size={path.size} />

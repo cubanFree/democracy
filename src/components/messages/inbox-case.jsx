@@ -18,13 +18,14 @@ export default function InboxCase({ data }) {
             
             <div className={cn(
                     "grid w-full h-full grid-rows-1",
-                    dataMessages ? 'grid-cols-[1fr_4fr] md:grid-cols-2' : 'grid-cols-1'
+                    dataMessages ? 'sm:grid-cols-[1fr_5fr] md:grid-cols-2' : 'grid-cols-1'
                 )}
                 >
                     {/* lista de inboxs */}
                     <div 
                         className={cn(
-                            "w-full h-full pb-12 flex flex-col gap-2 scroll-custom",
+                            "w-full h-full pb-12 scroll-custom",
+                            dataMessages ? 'hidden sm:flex flex-col gap-2' : 'flex flex-col gap-2'
                         )}
                         >
                             <ShowMessages search={search} data={data} dataMessages={dataMessages} openMessage={setDataMessages} />
@@ -32,8 +33,8 @@ export default function InboxCase({ data }) {
 
                     {/* messages */}
                     <div className={cn(
-                            "w-full flex flex-col p-2",
-                            dataMessages ? 'visible border-l border-gray-600 z-0' : 'hidden border-0'
+                            "w-full flex flex-col p-2 pb-12",
+                            dataMessages ? 'visible sm:border-l sm:border-gray-600 z-0' : 'hidden'
                         )}
                         >
                             <ContentMessage dataMessages={dataMessages} setDataMessages={setDataMessages} />
