@@ -1,83 +1,83 @@
 [
     {
-        "url_avatar": "http://example.com/avatar1.jpg",
+        "avatar_url": "/avatar_default.jpg",
         "user_name": "usuario01",
         "topic": "Tecnología",
         "content": "Hoy aprendí sobre las últimas tendencias en inteligencia artificial va receta de pastel de cho va receta.",
         "date": "2024-01-29"
     },
     {
-        "url_avatar": "http://example.com/avatar2.jpg",
+        "avatar_url": "/avatar_default.jpg",
         "user_name": "usuario02",
         "topic": "Cocina",
         "content": "Descubrí una nueva receta de pastel de chocolate.",
         "date": "2024-01-28"
     },
     {
-        "url_avatar": "http://example.com/avatar3.jpg",
+        "avatar_url": "/avatar_default.jpg",
         "user_name": "usuario03",
         "topic": "Viajes",
         "content": "Planeando mi próximo viaje a Japón.",
         "date": "2024-01-27"
     },
     {
-        "url_avatar": "http://example.com/avatar4.jpg",
+        "avatar_url": "/avatar_default.jpg",
         "user_name": "usuario04",
         "topic": "Deportes",
         "content": "Increíble juego de fútbol anoche.",
         "date": "2024-01-26"
     },
     {
-        "url_avatar": "http://example.com/avatar5.jpg",
+        "avatar_url": "/avatar_default.jpg",
         "user_name": "usuario05",
         "topic": "Música",
         "content": "Acabo de descubrir una banda genial.",
         "date": "2024-01-25"
     },
     {
-        "url_avatar": "http://example.com/avatar6.jpg",
+        "avatar_url": "/avatar_default.jpg",
         "user_name": "usuario06",
         "topic": "Libros",
         "content": "Empecé a leer un nuevo thriller fascinante.",
         "date": "2024-01-24"
     },
     {
-        "url_avatar": "http://example.com/avatar7.jpg",
+        "avatar_url": "/avatar_default.jpg",
         "user_name": "usuario07",
         "topic": "Cine",
         "content": "¿Alguien ha visto la última película de ciencia ficción?",
         "date": "2024-01-23"
     },
     {
-        "url_avatar": "http://example.com/avatar8.jpg",
+        "avatar_url": "/avatar_default.jpg",
         "user_name": "usuario08",
         "topic": "Moda",
         "content": "Encontré una tienda con ropa increíble a buenos precios.",
         "date": "2024-01-22"
     },
     {
-        "url_avatar": "http://example.com/avatar9.jpg",
+        "avatar_url": "/avatar_default.jpg",
         "user_name": "usuario09",
         "topic": "Salud",
         "content": "Consejos para mantenerse en forma durante el invierno.",
         "date": "2024-01-21"
     },
     {
-        "url_avatar": "http://example.com/avatar10.jpg",
+        "avatar_url": "/avatar_default.jpg",
         "user_name": "usuario10",
         "topic": "Ciencia",
         "content": "Últimos avances en energías renovables.",
         "date": "2024-01-20"
     },
     {
-        "url_avatar": "http://example.com/avatar11.jpg",
+        "avatar_url": "/avatar_default.jpg",
         "user_name": "usuario11",
         "topic": "Salud",
         "content": "Consejos para mantenerse en forma durante el invierno.",
         "date": "2024-01-21"
     },
     {
-        "url_avatar": "http://example.com/avatar12.jpg",
+        "avatar_url": "/avatar_default.jpg",
         "user_name": "usuario12",
         "topic": "Ciencia",
         "content": "Últimos avances en energías renovables.",

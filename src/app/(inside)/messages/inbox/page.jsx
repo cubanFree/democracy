@@ -4,15 +4,13 @@ import data from "./data.json"
 export default function Inbox() {
 
     return (
-        <main className="flex flex-col w-full h-full gap-2">
-            <div className="flex flex-col gap-2">
+        <main className="w-full h-full grid grid-rows-[1fr_20fr] gap-2">
+            <div className="w-full flex flex-col gap-2">
                 <span className="text-2xl">Inbox</span>
                 <div className="w-full border-b border-gray-700" />
             </div>
 
-            <div className="w-full h-full overflow-hidden flex flex-col gap-2">
-                <InboxCase data={data} />
-            </div>
+            <InboxCase data={data} />
         </main>
     )
 }

@@ -1,3 +1,8 @@
+/*
+    El estado dataMessage guarda el objeto del inbox seleccionado para mostrar su contenido.
+    El estado dataInbox es el arreglo de inboxs.
+*/
+
 'use client';
 
 import SearchBarInbox from "./search-bar";
@@ -8,38 +13,37 @@ import ContentMessage from "./content-message";
 
 export default function InboxCase({ data }) {
 
-    const [search, setSearch] = React.useState('')
-    const [dataMessages, setDataMessages] = React.useState(null)
+    const [dataMessage, setDataMessage] = React.useState([])
+    const [dataInbox, setDataInbox] = React.useState(data)
 
     return (
-        <>
-            {/* search bar */}
-            <SearchBarInbox setSearch={setSearch} search={search} />
-            
-            <div className={cn(
-                    "grid w-full h-full grid-rows-1",
-                    dataMessages ? 'sm:grid-cols-[1fr_5fr] md:grid-cols-2' : 'grid-cols-1'
-                )}
-                >
-                    {/* lista de inboxs */}
-                    <div 
-                        className={cn(
-                            "w-full h-full pb-12 scroll-custom",
-                            dataMessages ? 'hidden sm:flex flex-col gap-2' : 'flex flex-col gap-2'
-                        )}
-                        >
-                            <ShowMessages search={search} data={data} dataMessages={dataMessages} openMessage={setDataMessages} />
-                    </div>
+        <div className={cn(
+                "grid w-full h-full grid-rows-1 overflow-hidden",
+                dataMessage.length ? 'md:grid-cols-2' : 'grid-cols-1'
+            )}
+            >
+                {/* lista de inboxs */}
+                <div 
+                    className={cn(
+                        "w-full h-full scroll-custom relative",
+                        dataMessage.length ? 'hidden sm:flex sm:flex-col sm:gap-2' : 'flex flex-col gap-2'
+                    )}
+                    >
+                        {/* search bar */}
+                        <SearchBarInbox data={data} onSearch={setDataInbox} />
 
-                    {/* messages */}
-                    <div className={cn(
-                            "w-full flex flex-col p-2 pb-12",
-                            dataMessages ? 'visible sm:border-l sm:border-gray-600 z-0' : 'hidden'
-                        )}
-                        >
-                            <ContentMessage dataMessages={dataMessages} setDataMessages={setDataMessages} />
-                    </div>
-            </div>
-        </>
+                        {/* inboxs list */}
+                        <ShowMessages data={dataInbox} onOpen={setDataMessage} />
+                </div>
+
+                {/* messages */}
+                <div className={cn(
+                        "w-full h-full md:pl-2",
+                        dataMessage.length ? 'flex-wrap md:border-l md:border-gray-600 z-0' : 'hidden'
+                    )}
+                    >
+                        <ContentMessage data={dataMessage} onOpen={setDataMessage} />
+                </div>
+        </div>
     )
 }

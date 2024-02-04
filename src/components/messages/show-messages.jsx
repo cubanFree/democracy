@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image"
 import { RiCloudOffLine } from "react-icons/ri";
 
-export default function ShowMessages({ search, data, dataMessages, openMessage = () => {} }) {
+export default function ShowMessages({ data, onOpen = () => {} }) {
     
     return (
         <>
@@ -14,10 +14,9 @@ export default function ShowMessages({ search, data, dataMessages, openMessage =
                         <div 
                             key={index}
                             className={cn(
-                                "w-full border-b sm:border-gray-700 hover:bg-zinc-800 p-2 flex flex-col gap-2",
-                                item.user_name.includes(search) ? 'visible' : 'hidden'
+                                "w-full border-b sm:border-gray-700 hover:bg-zinc-800 p-2 flex flex-col gap-2"
                             )}
-                            onClick={() => openMessage([{ avatar_url: item.avatar_url, user_name: item.user_name, content: item.content, topic: item.topic, date: item.date }])}
+                            onClick={() => onOpen([{ avatar_url: item.avatar_url, user_name: item.user_name, content: item.content, topic: item.topic, date: item.date }])}
                             >
                                 <div 
                                     className={cn(
@@ -36,7 +35,6 @@ export default function ShowMessages({ search, data, dataMessages, openMessage =
                                         <div 
                                             className={cn(
                                                 "w-full flex flex-col justify-between",
-                                                dataMessages ? 'hidden md:flex' : ''
                                             )}
                                             >
                                                 <div className="w-full flex justify-between">
@@ -50,7 +48,6 @@ export default function ShowMessages({ search, data, dataMessages, openMessage =
                                 <span 
                                     className={cn(
                                         "w-full text-md text-gray-400 truncate",
-                                        dataMessages ? 'hidden md:flex' : 'visible'
                                     )}
                                     >
                                         {item.content}
@@ -62,8 +59,8 @@ export default function ShowMessages({ search, data, dataMessages, openMessage =
 
             {/* En caso de que no se encuentren resultados */}
             {
-                search && (
-                    <div className="flex flex-col justify-center items-center">
+                data.length === 0 && (
+                    <div className="w-full h-full flex flex-col justify-center items-center">
                         <RiCloudOffLine className="text-gray-600 animate-pulse" size={40} />
                         <span className="text-gray-500">No se encontraron resultados</span>
                     </div>
