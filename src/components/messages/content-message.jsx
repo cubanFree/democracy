@@ -11,7 +11,7 @@ export default function ContentMessage({ data, onOpen = () => {} }) {
     return (
         <>
             {/* Opciones de la caja de mensaje */}
-            <div className="w-full h-10 flex items-center justify-between border-b border-gray-700 sm:pb-0">
+            <div className="w-full h-10 flex items-center justify-between border-b-2 border-gray-500 p-2">
                 { data.length > 0 && <MdOutlineDelete size={20} /> }
                 <MdOutlineClear className="cursor-pointer" size={20} onClick={() => onOpen([])}/>
             </div>
@@ -19,7 +19,7 @@ export default function ContentMessage({ data, onOpen = () => {} }) {
             {/* Formulario de la caja de mensaje */}
             {
                 data.length > 0 ? (
-                    <div className="w-full h-full grid grid-rows-[1fr_8fr_1fr] grid-cols-1 pb-10">
+                    <div className="w-full h-full grid grid-rows-[1fr_12fr_1fr] grid-cols-1 pb-10 md:grid-rows-[1fr_8fr_1fr]">
 
                         {/* Header */}
                         <div className="w-full flex items-center gap-4 p-2">
@@ -48,25 +48,23 @@ export default function ContentMessage({ data, onOpen = () => {} }) {
                         {/* Footer */}
                         <div className="w-full p-2">
                             <form
-                                className="w-full h-full flex flex-col justify-center gap-2"
+                                className="w-full flex md:flex-col justify-center gap-2"
                                 >
                                     <Input
                                         name="message_send"
-                                        className="w-full text-sm bg-origin border border-gray-600 rounded-lg p-2 focus-visible:outline-none"
+                                        className="w-full text-sm bg-origin border border-gray-600 rounded-lg p-2 h-10"
                                         type="text"
                                         placeholder="write a message..."
                                         autoComplete="off"
                                         required
                                     />
-                                    <div className="w-full flex items-center justify-between">
-                                        <span className="text-gray-500">Attachments</span>
-                                        <Button
-                                            className="border border-gray-600 rounded-lg"
-                                            type="submit"
-                                        >
-                                            Send
-                                        </Button>
-                                    </div>
+
+                                    <Button
+                                        className="border border-gray-600 rounded-lg md:self-end"
+                                        type="submit"
+                                    >
+                                        Send
+                                    </Button>
                             </form>
                         </div>
 

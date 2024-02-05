@@ -20,14 +20,14 @@ export default function AvatarConf({ avatar_url, status}) {
                     )}
                 />
             </DialogTrigger>
-            <DialogContent className="w-96 h-96 p-0 bg-transparent border-0 dark">
+            <DialogContent className="w-full h-full p-0 bg-transparent border-0">
                 <Image 
                     src={avatar_url || '/avatar_default.jpg'}
                     alt="avatar profile"
-                    width={1000}
-                    height={1000}
+                    width={500}
+                    height={500}
                     priority
-                    className="object-cover w-full h-full rounded-2xl"
+                    className="object-cover w-full h-full"
                 />
             </DialogContent>
         </Dialog>

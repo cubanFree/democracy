@@ -62,7 +62,7 @@ export default async function CaseProfile() {
             <div className="w-full flex gap-4 lg:gap-2 lg:flex-col">
                 <AvatarConf avatar_url={dataUser?.avatar_url} status={dataUser?.status}/>
                 
-                <div className="w-full flex flex-col items-start gap-2 lg:items-center">
+                <div className="flex flex-col items-start gap-2 lg:items-center">
 
                     {/* nombre y roles */}
                     <span className="flex gap-2 justify-center items-center text-xl font-bold text-center lg:text-2xl">

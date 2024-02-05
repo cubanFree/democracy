@@ -24,7 +24,7 @@ export default function SearchBarInbox({ data, onSearch = () => {} }) {
     }
 
     return (
-        <main className="w-full flex flex-col gap-2 sticky top-0 bg-sub-origin px-2">
+        <main className="w-full flex flex-col gap-2 sticky top-0 bg-sub-origin px-2 py-1">
 
             <div className="w-full flex justify-start items-center gap-2">
                 <label

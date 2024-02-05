@@ -9,7 +9,7 @@ export default function layout({ children }) {
                 <MenuBarMessages />
             </div>
 
-            <div className="w-full h-full rounded-xl p-2 bg-card shadow-lg overflow-hidden">
+            <div className="w-full h-full rounded-xl bg-card overflow-hidden">
                 {children}
             </div>
         </main>

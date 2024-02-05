@@ -26,7 +26,7 @@ export default function InboxCase({ data }) {
                 <div 
                     className={cn(
                         "w-full h-full scroll-custom relative",
-                        dataMessage.length ? 'hidden sm:flex sm:flex-col sm:gap-2' : 'flex flex-col gap-2'
+                        dataMessage.length ? 'hidden md:flex md:flex-col' : 'flex flex-col'
                     )}
                     >
                         {/* search bar */}
@@ -38,8 +38,8 @@ export default function InboxCase({ data }) {
 
                 {/* messages */}
                 <div className={cn(
-                        "w-full h-full md:pl-2",
-                        dataMessage.length ? 'flex-wrap md:border-l md:border-gray-600 z-0' : 'hidden'
+                        "w-full h-full",
+                        dataMessage.length ? 'flex-wrap md:border-l-2 md:border-gray-500 z-0' : 'hidden'
                     )}
                     >
                         <ContentMessage data={dataMessage} onOpen={setDataMessage} />

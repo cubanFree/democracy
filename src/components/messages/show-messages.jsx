@@ -14,7 +14,7 @@ export default function ShowMessages({ data, onOpen = () => {} }) {
                         <div 
                             key={index}
                             className={cn(
-                                "w-full border-b sm:border-gray-700 hover:bg-zinc-800 p-2 flex flex-col gap-2"
+                                "w-full border-b border-gray-700 hover:bg-zinc-800 px-2 py-4 flex flex-col gap-2"
                             )}
                             onClick={() => onOpen([{ avatar_url: item.avatar_url, user_name: item.user_name, content: item.content, topic: item.topic, date: item.date }])}
                             >
@@ -38,7 +38,7 @@ export default function ShowMessages({ data, onOpen = () => {} }) {
                                             )}
                                             >
                                                 <div className="w-full flex justify-between">
-                                                    <span className="text-md font-semibold">{item.user_name}</span>
+                                                    <span className="text-md">{item.user_name}</span>
                                                     <span className="text-sm text-gray-400">{item.date}</span>
                                                 </div>
                                                 <span className="text-sm "><span className="text-yellow-700">Topic: </span><span className="text-gray-400">{item.topic}</span></span>
@@ -47,7 +47,7 @@ export default function ShowMessages({ data, onOpen = () => {} }) {
 
                                 <span 
                                     className={cn(
-                                        "w-full text-md text-gray-400 truncate",
+                                        "w-full text-sm text-gray-400 truncate",
                                     )}
                                     >
                                         {item.content}
