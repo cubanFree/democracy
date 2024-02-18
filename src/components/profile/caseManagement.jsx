@@ -3,14 +3,14 @@ import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Tabl
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 
-export default async function CaseInfoManagement() {
+export default async function CaseInfoManagement({ idTarget }) {
 
     const supabase = createServerComponentClient({ cookies });
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('ID user not found');
 
     // fetching informacion de la Compania
-    const { data: dataCompany, error: errorCompany } = await fetchProfileData(user?.id, 'info_management', 
+    const { data: dataCompany, error: errorCompany } = await fetchProfileData(idTarget || user?.id, 'info_management', 
         ['directors', 
         'employees_workers', 
         'employees_administration', 

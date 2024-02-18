@@ -1,4 +1,6 @@
+import ErrorDebounce from "@/components/general/errorDebounce";
 import MenuBarMessages from "@/components/messages/menu-bar";
+import { Suspense } from "react";
 
 export default function layout({ children }) {
 
@@ -10,7 +12,11 @@ export default function layout({ children }) {
             </div>
 
             <div className="w-full h-full rounded-xl bg-card overflow-hidden">
-                {children}
+                <ErrorDebounce>
+                    <Suspense fallback={<h1>Loading...</h1>}>
+                        {children}
+                    </Suspense>
+                </ErrorDebounce>
             </div>
         </main>
     )

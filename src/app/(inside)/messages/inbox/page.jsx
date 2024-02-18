@@ -1,11 +1,14 @@
 import InboxCase from "@/components/messages/inbox-case";
-import data from "./data.json"
+import { fetchInbox } from "@/lib/data";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
-export default function Inbox() {
+export default async function Inbox() {
 
-    return (
-        <main className="w-full h-full">
-            <InboxCase data={data} />
-        </main>
-    )
+    const supabase = createServerComponentClient({ cookies });
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const { data } = await fetchInbox();
+
+    return <InboxCase data={data} idHost={user?.id} />
 }

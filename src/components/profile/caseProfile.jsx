@@ -1,7 +1,6 @@
 import { fetchProfileData } from "@/lib/data";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
-import { cn } from "@/lib/utils";
 import { MdOutlineDateRange, MdOutlineLocationOn } from "react-icons/md";
 import { DropdownMenuSeparator } from "../ui/dropdown-menu";
 import moment from "moment/moment";
@@ -9,21 +8,24 @@ import AvatarConf from "./avatar-conf";
 import { IoEarth } from "react-icons/io5";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 import { FaBuildingWheat } from "react-icons/fa6"; // icono de empresa beginner
-import { FaBuildingCircleExclamation } from "react-icons/fa6"; // icono de con riesgos
-import { FaBuildingCircleXmark } from "react-icons/fa6"; // icono de empresa en banca rota
-import { FaBuildingCircleCheck } from "react-icons/fa6"; // icono de empresa sin riesgos
-import { FaBuildingShield } from "react-icons/fa6"; // icono de empresa segura
-import { RiGovernmentLine } from "react-icons/ri"; // icono de governador del pais
+// import { FaBuildingCircleExclamation } from "react-icons/fa6"; // icono de con riesgos
+// import { FaBuildingCircleXmark } from "react-icons/fa6"; // icono de empresa en banca rota
+// import { FaBuildingCircleCheck } from "react-icons/fa6"; // icono de empresa sin riesgos
+// import { FaBuildingShield } from "react-icons/fa6"; // icono de empresa segura
+// import { RiGovernmentLine } from "react-icons/ri"; // icono de governador del pais
 import { HiOutlineIdentification } from "react-icons/hi2"; // icono de identidad
+import { SlOptionsVertical } from "react-icons/sl"; // icono de Options
+import { Button } from "../ui/button";
+import DesignSendMessage from "./design-sendMessage";
 
-export default async function CaseProfile() {
+export default async function CaseProfile({ idTarget }) {
 
     const supabase = createServerComponentClient({ cookies });
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('ID user not found');
 
     // fetching informacion del Profile
-    const { data: dataUser, error: errorUser } = await fetchProfileData(user?.id, 'users', 
+    const { data: dataUser, error: errorUser } = await fetchProfileData(idTarget || user?.id, 'users', 
         ['avatar_url', 
         'user_name', 
         'status', 
@@ -45,7 +47,7 @@ export default async function CaseProfile() {
     }
 
     // fetching informacion del About
-    const { data: dataAbout, error: errorAbout } = await fetchProfileData(user?.id, 'info_about', ['ranking_local', 'ranking_global', 'rating']);
+    const { data: dataAbout, error: errorAbout } = await fetchProfileData(idTarget || user?.id, 'info_about', ['ranking_local', 'ranking_global', 'rating']);
     if (errorAbout) throw new Error('(Try refresh, else): It is recommended that you Log out, and then Log in. If it doesn`t work, please contact us or send a report.');
 
     // convertir fecha de creacion
@@ -107,6 +109,23 @@ export default async function CaseProfile() {
                                     </TooltipProvider>
                                 ))
                             }
+                    </div>
+
+                    {/* Friends - Send Message - opciones */}
+                    <div className="w-full flex justify-between items-center gap-5">
+                        <Button variant="default" className="w-full flex justify-center items-center bg-card text-gray-300">
+                            Friends
+                        </Button>
+
+                        {
+                            idTarget && (
+                                <DesignSendMessage idHost={user?.id} idTarget={idTarget} user_name={dataUser?.user_name} />
+                            )
+                        }
+                        
+                        <div className="flex justify-end items-center">
+                            <SlOptionsVertical size={15} className="" />
+                        </div>
                     </div>
 
                     {/* description */}

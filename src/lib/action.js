@@ -112,3 +112,103 @@ export async function changeStatus(status) {
         return { error };
     }
 }
+
+export async function create_message({inbox_id, content_text}) {
+
+    const supabase = createServerActionClient({ cookies });
+
+    try {
+        if (!inbox_id) throw new Error('Inbox id not found');
+        const { error: errorCreateMessage } = await supabase
+            .from('messages')
+            .insert({
+                content: content_text.message,
+                user_id: content_text.user_id,
+                inbox_id,
+            })
+        
+        console.log('createMessage ->>> ', errorCreateMessage)
+        if (errorCreateMessage) throw new Error(errorCreateMessage);
+
+        return { error: null };
+
+    } catch (error) {
+        console.error('[ ERROR create_Message ]', error.message);
+        return { error };
+    }
+}
+
+export async function create_inbox({user_id1, user_id2, content_text, avatar_group = null, is_group = false}) {
+
+    const supabase = createServerActionClient({ cookies });
+
+    try {
+        let inbox_id;
+
+        // Verificar si alguno de los usuarios ha bloqueado al otro
+        const { data: user_blocked, error: errorBlocked } = await supabase
+            .from('users_blocked')
+            .select('*')
+            .or(`user_emit.eq.${user_id1},user_target.eq.${user_id2}`)
+            .or(`user_emit.eq.${user_id2},user_target.eq.${user_id1}`);
+
+        console.log('user_blocked ->>> ', user_blocked, errorBlocked)
+
+        if (errorBlocked) throw new Error(errorBlocked);
+        if (user_blocked.length > 0) throw new Error('Message could not be sent.')
+
+        // Chequear si hay una conversacion existente entre los dos usuarios
+        const { data: inboxExists, error: errorInboxExists } = await supabase
+            .rpc('check_existing_conversation', { user_id1, user_id2});
+
+        console.log('inboxExists ->>> ', inboxExists, errorInboxExists)
+
+        if (errorInboxExists) throw new Error(errorInboxExists);
+        if (inboxExists.length > 0 && inboxExists[0]?.result[0]?.is_group === false) inbox_id = inboxExists[0]?.result[0]?.inbox_id
+
+        // Crear una nueva conversacion en caso de que inboxExists no devuelve un id, que is_group sea false, y despues agregar el mensaje a la conversacion
+        if (is_group === true) {
+            const { data: inboxCreate, error: errorCreateInbox } = await supabase
+                .rpc('create_inbox', { user_id1, user_id2, is_group: true });
+            
+            console.log('inboxCreateGroup ->>> ', inboxCreate, errorCreateInbox)
+            if (errorCreateInbox) throw new Error(errorCreateInbox);
+
+            // Validate avatar
+            const { error: avatarError } = (avatar_group?.size > 0) && await supabase.storage.from('avatar_profile').upload(inboxCreate, avatar_group, {
+                cacheControl: '3600',
+                upsert: true,
+                contentType: avatar_group.type
+            });
+            if (avatarError) throw new Error(avatarError);
+
+            // Obtener la URL-token de la imagen de perfil
+            const signedUrl = (avatar_group?.size > 0) ? await supabase.storage.from('avatar_profile').createSignedUrl(inboxCreate, 1000000).then(res => res.data?.signedUrl) : null;
+
+            // subir/guardar el avatar en el inbox correspondiente
+            const { error: errorUpdateInbox } = await supabase.from('inbox').update({ avatar_group: signedUrl || null }).eq('id', inboxCreate);
+            if (errorUpdateInbox) throw new Error(errorUpdateInbox);
+
+        } else {
+            if (inboxExists.length === 0 || (inboxExists.length > 0 && inboxExists[0]?.is_group === true)) {
+                const { data: inboxCreate, error: errorCreateInbox } = await supabase
+                    .rpc('create_inbox', { user_id1, user_id2 });
+                
+                console.log('inboxCreateSingle ->>> ', inboxCreate, errorCreateInbox)
+                if (errorCreateInbox) throw new Error(errorCreateInbox);
+
+                inbox_id = inboxCreate
+            }
+
+            // Agregar el mensaje a la conversacion existente
+            const { error: errorCreate_Message } = await create_message({ inbox_id, content_text });
+            if (errorCreate_Message) throw new Error(errorCreate_Message);
+        }
+
+        return { error: null };
+
+    } catch (error) {
+        console.error('[ ERROR create_inbox ]', error.message);
+        return { error: error.message };
+    }
+}

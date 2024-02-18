@@ -1,86 +1,204 @@
 [
     {
         "avatar_url": "/avatar_default.jpg",
-        "user_name": "usuario01",
+        "user_name": "usuario2",
         "topic": "Tecnología",
-        "content": "Hoy aprendí sobre las últimas tendencias en inteligencia artificial va receta de pastel de cho va receta.",
+        "content": [
+            {
+                "role": "host",
+                "message": "Acabo de probar las nuevas gafas de realidad aumentada.",
+                "date": "2024-02-06"
+            },
+            {
+                "role": "recipient",
+                "message": "¡Suena genial!",
+                "date": "2024-02-05"
+            },
+            {
+                "role": "host",
+                "message": "Acabo de probar las nuevas gafas de realidad aumentada.",
+                "date": "2024-02-06"
+            },
+            {
+                "role": "recipient",
+                "message": "¡Suena genial!",
+                "date": "2024-02-05"
+            },
+            {
+                "role": "host",
+                "message": "Acabo de probar las nuevas gafas de realidad aumentada.",
+                "date": "2024-02-06"
+            },
+            {
+                "role": "recipient",
+                "message": "¡Suena genial!",
+                "date": "2024-02-05"
+            },
+            {
+                "role": "host",
+                "message": "Acabo de probar las nuevas gafas de realidad aumentada.",
+                "date": "2024-02-06"
+            },
+            {
+                "role": "recipient",
+                "message": "¡Suena genial!",
+                "date": "2024-02-05"
+            },
+            {
+                "role": "host",
+                "message": "Acabo de probar las nuevas gafas de realidad aumentada.",
+                "date": "2024-02-06"
+            },
+            {
+                "role": "recipient",
+                "message": "¡Suena genial!",
+                "date": "2024-02-05"
+            }
+        ],
+        "date": "2024-02-06"
+    },
+    {
+        "avatar_url": "/avatar_default.jpg",
+        "user_name": "usuario3",
+        "topic": "Cocina",
+        "content": [
+            {
+                "role": "host",
+                "message": "He descubierto una receta increíble de lasaña vegetariana.",
+                "date": "2024-02-04"
+            },
+            {
+                "role": "recipient",
+                "message": "Eso suena delicioso, ¿puedes compartir la receta?",
+                "date": "2024-02-03"
+            }
+        ],
+        "date": "2024-02-04"
+    },
+    {
+        "avatar_url": "/avatar_default.jpg",
+        "user_name": "usuario4",
+        "topic": "Deportes",
+        "content": [
+            {
+                "role": "host",
+                "message": "Estoy emocionado por el inicio de la temporada de fútbol.",
+                "date": "2024-02-02"
+            },
+            {
+                "role": "recipient",
+                "message": "¡Yo también! ¿A qué equipo estás apoyando?",
+                "date": "2024-02-01"
+            }
+        ],
+        "date": "2024-02-02"
+    },
+    {
+        "avatar_url": "/avatar_default.jpg",
+        "user_name": "usuario5",
+        "topic": "Música",
+        "content": [
+            {
+                "role": "host",
+                "message": "Voy a asistir al concierto de mi banda favorita el próximo mes.",
+                "date": "2024-01-31"
+            },
+            {
+                "role": "recipient",
+                "message": "Qué emocionante, ¿cuál es la banda?",
+                "date": "2024-01-30"
+            }
+        ],
+        "date": "2024-01-31"
+    },
+    {
+        "avatar_url": "/avatar_default.jpg",
+        "user_name": "usuario6",
+        "topic": "Literatura",
+        "content": [
+            {
+                "role": "host",
+                "message": "Recientemente, empecé a leer un nuevo libro de ciencia ficción.",
+                "date": "2024-01-29"
+            },
+            {
+                "role": "recipient",
+                "message": "Interesante, ¿quién es el autor?",
+                "date": "2024-01-28"
+            }
+        ],
         "date": "2024-01-29"
     },
     {
         "avatar_url": "/avatar_default.jpg",
-        "user_name": "usuario02",
-        "topic": "Cocina",
-        "content": "Descubrí una nueva receta de pastel de chocolate.",
-        "date": "2024-01-28"
+        "user_name": "usuario7",
+        "topic": "Literatura",
+        "content": [
+            {
+                "role": "host",
+                "message": "Recientemente, empecé a leer un nuevo libro de ciencia ficción.",
+                "date": "2024-01-29"
+            },
+            {
+                "role": "recipient",
+                "message": "Interesante, ¿quién es el autor?",
+                "date": "2024-01-28"
+            }
+        ],
+        "date": "2024-01-29"
     },
     {
         "avatar_url": "/avatar_default.jpg",
-        "user_name": "usuario03",
-        "topic": "Viajes",
-        "content": "Planeando mi próximo viaje a Japón.",
-        "date": "2024-01-27"
+        "user_name": "usuario8",
+        "topic": "Literatura",
+        "content": [
+            {
+                "role": "host",
+                "message": "Recientemente, empecé a leer un nuevo libro de ciencia ficción.",
+                "date": "2024-01-29"
+            },
+            {
+                "role": "recipient",
+                "message": "Interesante, ¿quién es el autor?",
+                "date": "2024-01-28"
+            }
+        ],
+        "date": "2024-01-29"
     },
     {
         "avatar_url": "/avatar_default.jpg",
-        "user_name": "usuario04",
-        "topic": "Deportes",
-        "content": "Increíble juego de fútbol anoche.",
-        "date": "2024-01-26"
-    },
-    {
-        "avatar_url": "/avatar_default.jpg",
-        "user_name": "usuario05",
-        "topic": "Música",
-        "content": "Acabo de descubrir una banda genial.",
-        "date": "2024-01-25"
-    },
-    {
-        "avatar_url": "/avatar_default.jpg",
-        "user_name": "usuario06",
-        "topic": "Libros",
-        "content": "Empecé a leer un nuevo thriller fascinante.",
-        "date": "2024-01-24"
-    },
-    {
-        "avatar_url": "/avatar_default.jpg",
-        "user_name": "usuario07",
-        "topic": "Cine",
-        "content": "¿Alguien ha visto la última película de ciencia ficción?",
-        "date": "2024-01-23"
-    },
-    {
-        "avatar_url": "/avatar_default.jpg",
-        "user_name": "usuario08",
-        "topic": "Moda",
-        "content": "Encontré una tienda con ropa increíble a buenos precios.",
-        "date": "2024-01-22"
-    },
-    {
-        "avatar_url": "/avatar_default.jpg",
-        "user_name": "usuario09",
-        "topic": "Salud",
-        "content": "Consejos para mantenerse en forma durante el invierno.",
-        "date": "2024-01-21"
+        "user_name": "usuario9",
+        "topic": "Literatura",
+        "content": [
+            {
+                "role": "host",
+                "message": "Recientemente, empecé a leer un nuevo libro de ciencia ficción.",
+                "date": "2024-01-29"
+            },
+            {
+                "role": "recipient",
+                "message": "Interesante, ¿quién es el autor?",
+                "date": "2024-01-28"
+            }
+        ],
+        "date": "2024-01-29"
     },
     {
         "avatar_url": "/avatar_default.jpg",
         "user_name": "usuario10",
-        "topic": "Ciencia",
-        "content": "Últimos avances en energías renovables.",
-        "date": "2024-01-20"
-    },
-    {
-        "avatar_url": "/avatar_default.jpg",
-        "user_name": "usuario11",
-        "topic": "Salud",
-        "content": "Consejos para mantenerse en forma durante el invierno.",
-        "date": "2024-01-21"
-    },
-    {
-        "avatar_url": "/avatar_default.jpg",
-        "user_name": "usuario12",
-        "topic": "Ciencia",
-        "content": "Últimos avances en energías renovables.",
-        "date": "2024-01-20"
+        "topic": "Literatura",
+        "content": [
+            {
+                "role": "host",
+                "message": "Recientemente, empecé a leer un nuevo libro de ciencia ficción.",
+                "date": "2024-01-29"
+            },
+            {
+                "role": "recipient",
+                "message": "Interesante, ¿quién es el autor?",
+                "date": "2024-01-28"
+            }
+        ],
+        "date": "2024-01-29"
     }
 ]

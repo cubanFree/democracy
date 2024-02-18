@@ -6,12 +6,17 @@
 'use client';
 
 import SearchBarInbox from "./search-bar";
-import React from "react";
-import ShowMessages from "./show-messages";
+import React, { Suspense } from "react";
 import { cn } from "@/lib/utils";
 import ContentMessage from "./content-message";
+import ShowInboxes from "./show-inboxes";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-export default function InboxCase({ data }) {
+export default function InboxCase({ data, idHost }) {
+    
+    if (!data) throw new Error('ERROR 500: Something went wrong in Inbox');
+
+    const supabase = createClientComponentClient();
 
     const [dataMessage, setDataMessage] = React.useState([])
     const [dataInbox, setDataInbox] = React.useState(data)
@@ -33,16 +38,18 @@ export default function InboxCase({ data }) {
                         <SearchBarInbox data={data} onSearch={setDataInbox} />
 
                         {/* inboxs list */}
-                        <ShowMessages data={dataInbox} onOpen={setDataMessage} />
+                        <ShowInboxes idHost={idHost} data={dataInbox} supabase={supabase} onOpen={setDataMessage} />
                 </div>
 
                 {/* messages */}
                 <div className={cn(
-                        "w-full h-full",
-                        dataMessage.length ? 'flex-wrap md:border-l-2 md:border-gray-500 z-0' : 'hidden'
+                        "w-full h-full overflow-hidden",
+                        dataMessage.length ? 'md:border-l-2 md:border-gray-500 z-0' : 'hidden'
                     )}
                     >
-                        <ContentMessage data={dataMessage} onOpen={setDataMessage} />
+                        <Suspense fallback={<span>Loading messages...</span>}>
+                            <ContentMessage idHost={idHost} supabase={supabase} data={dataMessage} onClose={setDataMessage} />
+                        </Suspense>
                 </div>
         </div>
     )
