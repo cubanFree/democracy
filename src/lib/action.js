@@ -212,3 +212,23 @@ export async function create_inbox({user_id1, user_id2, content_text, avatar_gro
         return { error: error.message };
     }
 }
+
+export async function update_column({ filter, table, column, value }) {
+    const supabase = createServerActionClient({ cookies });
+    
+    try {
+        if (!filter || !table || !column || !value) throw new Error('Missing data');
+
+        const { error } = await supabase
+            .from(table)
+            .update({ [column]: value })
+            .match(filter);
+
+        if (error) throw new Error(error.message);
+        return { error: null };
+
+    } catch (error) {
+        console.error('[ ERROR update_column ]', error.message);
+        return { error: error.message };
+    }
+}

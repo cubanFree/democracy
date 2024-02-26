@@ -64,16 +64,16 @@ export async function fetchInbox() {
     const { data: { user } } = await supabase.auth.getUser();
 
     try {
-        // Obtener todos los inbox_ids y si es grupal o individual
+        // Obtener todos los inbox_ids, si es grupal o individual y los mensajes no leídos
         const { data: inboxes, error: inboxError } = await supabase
             .from('inbox_members')
-            .select('inbox_id, inbox:inbox_id (is_group, title_inbox, avatar_group)')
+            .select('inbox_id, unread_messages, inbox:inbox_id (is_group, title_inbox, avatar_group)')
             .eq('user_id', user?.id);
 
         if (inboxError) throw new Error(`Error fetching inboxes: ${inboxError.message || 'Unknown error'}`);
 
         // Obtener el resumen de cada inbox
-        const inboxResumen = await Promise.all(inboxes.map(async ({ inbox_id, inbox }) => {
+        const inboxResumen = await Promise.all(inboxes.map(async ({ inbox_id, unread_messages, inbox }) => {
             // Obtener el último mensaje de cada inbox
             const { data: messages, error: messagesError } = await supabase
                 .from('messages')
@@ -125,6 +125,7 @@ export async function fetchInbox() {
                 contacts: [...contactsInfo],
                 lastMessage_content: lastMessage ? lastMessage.content : "",
                 lastMessage_time: lastMessage ? lastMessage.created_at : "",
+                unread_messages,
             };
         }));
 

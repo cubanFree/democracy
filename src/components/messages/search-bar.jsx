@@ -13,7 +13,7 @@ export default function SearchBarInbox({ data, onSearch = () => {} }) {
     //estado de la busqueda
     const handleSearch = (value) => {
         setSearch(value)
-        onSearch(data.filter(item => item.user_name.toLowerCase().includes(value.toLowerCase())))
+        onSearch(data.filter(item => item.contacts[0].user_name.toLowerCase().includes(value.toLowerCase())))
     }
 
     // estado de Cancelar busqueda

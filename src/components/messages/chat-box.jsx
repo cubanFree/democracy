@@ -16,11 +16,23 @@ import { create_message } from "@/lib/action";
 import { FiLoader } from "react-icons/fi";
 // import BtnScrollDown from "./btn-scrollDown";
 
-export default function ContentMessage({ idHost, supabase, data, onClose = () => {} }) {
+export default function ChatBox(
+    { 
+        idHost, 
+        supabase, 
+        data, 
+        onClose = () => {},
+    }
+) {
 
-    // estado para obtener los mensajes
+    const bodyScrollRef = useRef(null);
+    const inputRef = useRef(null);
+
     const [messages, setMessages] = React.useState([]);
     const [loadingMessages, setLoadingMessages] = React.useState(true);
+    const [loadingSendMessage, setLoadingSendMessage] = React.useState(false);
+
+    // estado para obtener los mensajes
     useEffect(() => {
         if (!data[0]?.inbox_id) return;
         const getMessages = async () => {
@@ -32,29 +44,28 @@ export default function ContentMessage({ idHost, supabase, data, onClose = () =>
         getMessages();
     }, [data]);
 
+    // escuchando nuevos mensajes Realtime
+    useEffect(() => {
+        const channel = supabase.channel('realtime-messages').on('postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'messages' }, 
+            (payload) => {
+                // cuando enviamos un nuevo mensaje, cambiamos el estado del inbox con el nuevo mensaje
+                data[0]?.inbox_id === payload.new.inbox_id && setMessages((prev) => [...prev, payload.new]);
+            }
+        ).subscribe();
+
+        return () => supabase.removeChannel(channel);
+    }, [messages, supabase]);
+
     // estado para hacer scroll automatico
-    const bodyScrollRef = useRef();
     useEffect(() => {
         if (messages?.length) {
             scrollDown({ ref: bodyScrollRef });
         }
     }, [messages]);
 
-    // escuchando nuevos mensajes Realtime
-    useEffect(() => {
-        const channel =supabase.channel('realtime-messages').on('postgres_changes', 
-            { event: 'INSERT', schema: 'public', table: 'messages' }, 
-            (payload) => {
-                data[0]?.inbox_id === payload.new.inbox_id && setMessages([...messages, payload.new]);
-            }
-        ).subscribe();
-
-        return () => supabase.removeChannel(channel);
-    }, [supabase, messages]);
 
     // estado para enviar un nuevo mensaje
-    const [loadingSendMessage, setLoadingSendMessage] = React.useState(false);
-    const inputRef = useRef(null);
     const sendMessage = async (formData) => {
         setLoadingSendMessage(true);
         try {
