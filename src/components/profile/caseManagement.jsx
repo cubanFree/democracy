@@ -1,5 +1,5 @@
 import { fetchProfileData } from "@/lib/data";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 
@@ -10,8 +10,8 @@ export default async function CaseInfoManagement({ idTarget }) {
     if (!user) throw new Error('ID user not found');
 
     // fetching informacion de la Compania
-    const { data: dataCompany, error: errorCompany } = await fetchProfileData(idTarget || user?.id, 'info_management', 
-        ['directors', 
+    const { data: dataCompany, error: errorCompany } = await fetchProfileData({ filter: {id: idTarget || user?.id}, table: 'info_management', 
+        caseBox: ['directors', 
         'employees_workers', 
         'employees_administration', 
         'administrative_expenses', 
@@ -21,7 +21,7 @@ export default async function CaseInfoManagement({ idTarget }) {
         'infrastructure_valuation', 
         'patents_valuation', 
         'liabilities_bonds_sold', 
-        'liabilities_interest_payment']);
+        'liabilities_interest_payment'] });
     if (errorCompany) throw new Error('ERROR 500: something goes wrong when getting Information Company.');
 
     const invoices = [

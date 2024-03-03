@@ -25,29 +25,29 @@ export default async function CaseProfile({ idTarget }) {
     if (!user) throw new Error('ID user not found');
 
     // fetching informacion del Profile
-    const { data: dataUser, error: errorUser } = await fetchProfileData(idTarget || user?.id, 'users', 
-        ['avatar_url', 
+    const { data: dataUser, error: errorUser } = await fetchProfileData({ filter: {id: idTarget || user?.id}, table: 'users', 
+        caseBox: ['avatar_url', 
         'user_name', 
         'status', 
         'created_at', 
         'citizenship', 
         'residenceship', 
         'roles', 
-        'description']);
+        'description'] });
     if (errorUser) throw new Error('(Try refresh, else): It is recommended that you Log out, and then Log in. If it doesn`t work, please contact us or send a report.');
 
     // fetching citizenship y residenceship(si existe)
-    const req1 = fetchProfileData(dataUser?.citizenship, 'countries', ['name']);
+    const req1 = fetchProfileData({ filter: {id: dataUser?.citizenship}, table: 'countries', caseBox: ['name'] });
     let citizenship, residenceship;
     if (dataUser?.residenceship) {
-        const req2 = fetchProfileData(dataUser?.residenceship, 'countries', ['name']);
+        const req2 = fetchProfileData({ filter: {id: dataUser?.residenceship}, table: 'countries', caseBox: ['name'] });
         [citizenship, residenceship] = await Promise.allSettled([req1, req2]);
     } else {
         citizenship = await req1;
     }
 
     // fetching informacion del About
-    const { data: dataAbout, error: errorAbout } = await fetchProfileData(idTarget || user?.id, 'info_about', ['ranking_local', 'ranking_global', 'rating']);
+    const { data: dataAbout, error: errorAbout } = await fetchProfileData({ filter: {id: idTarget || user?.id}, table: 'info_about', caseBox: ['ranking_local', 'ranking_global', 'rating'] });
     if (errorAbout) throw new Error('(Try refresh, else): It is recommended that you Log out, and then Log in. If it doesn`t work, please contact us or send a report.');
 
     // convertir fecha de creacion

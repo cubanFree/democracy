@@ -1,7 +1,14 @@
 import ErrorDebounce from "@/components/general/errorDebounce";
 import FooterBar from "@/components/home/footerBar";
 import HeaderBar from "@/components/home/headerBar";
-export default function layout({ children }) {
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
+
+export default async function layout({ children }) {
+    
+    const supabase = createServerComponentClient({ cookies });
+    const { data: { user } } = await supabase.auth.getUser();
+    
     return (
         <main className="flex flex-col h-screen w-full overflow-hidden">
             <div className="w-full h-auto">
@@ -15,7 +22,7 @@ export default function layout({ children }) {
             </div>
 
             <div className="w-full min-h-16">
-                <FooterBar />
+                <FooterBar idHost={user?.id} />
             </div>
         </main>
     )

@@ -113,12 +113,14 @@ export async function changeStatus(status) {
     }
 }
 
-export async function create_message({inbox_id, content_text}) {
+export async function create_message(inbox_id, content_text, contacts_id, isInboxOpen) { // contacts [user_id1, user_id2, ...]
 
     const supabase = createServerActionClient({ cookies });
 
     try {
-        if (!inbox_id) throw new Error('Inbox id not found');
+        if (!inbox_id || !content_text.message || !content_text.user_id) throw new Error('Missing parameters.');
+
+        // crtear un nuevo message
         const { error: errorCreateMessage } = await supabase
             .from('messages')
             .insert({
@@ -126,15 +128,24 @@ export async function create_message({inbox_id, content_text}) {
                 user_id: content_text.user_id,
                 inbox_id,
             })
-        
-        console.log('createMessage ->>> ', errorCreateMessage)
+
         if (errorCreateMessage) throw new Error(errorCreateMessage);
 
-        return { error: null };
+        const preparedContacts = contacts_id.map(async (id) => {
+            await supabase
+                .from('inbox_members')
+                .update({ isSeen: false })
+                .match({ inbox_id, user_id: id, isSeen: true })
+        });
+
+        const results = await Promise.allSettled(preparedContacts);
+        const rejected = results.some((r) => r.status === 'rejected')
+
+        return { rejected, error: null }
 
     } catch (error) {
         console.error('[ ERROR create_Message ]', error.message);
-        return { error };
+        return { rejected: null, error: error.message };
     }
 }
 
@@ -230,5 +241,91 @@ export async function update_column({ filter, table, column, value }) {
     } catch (error) {
         console.error('[ ERROR update_column ]', error.message);
         return { error: error.message };
+    }
+}
+
+export async function updateMessagesToRead(sender_id, inboxId, host_id, is_group) {
+    
+    const supabase = createServerActionClient({ cookies });
+
+    try {
+        if (!sender_id || !inboxId || !host_id) throw new Error('Missing data.');
+
+        const { error } = await supabase
+            .from('inbox_members')
+            .update({ isSeen: true })
+            .match({ inbox_id: inboxId, user_id: host_id, isSeen: false });
+
+        if (error) throw new Error(error.message);
+
+        if (!is_group) {
+            // EN LOS INDIVIDUALES, actualizamos el los mensajes del recividor con isRead a TRUE
+            const { error } = await supabase
+                .from('messages')
+                .update({ isRead: true })
+                .match({ inbox_id: inboxId, user_id: sender_id, isRead: false });
+
+            if (error) throw new Error(error.message);
+
+            return { data: null };
+
+        } else {
+            // EN LOS GRUPOS, chequeamos a cada usuario con el inbox_id si tiene isSeen en TRUE
+            
+            // Obtiene todos los miembros del Inbox (grupo)
+            const { data: members, error } = await supabase
+                .from('inbox_members')
+                .select('user_id, isSeen')
+                .eq('inbox_id', inboxId);
+
+            if (error) throw new Error('Error fetching inbox members:', error.message);
+
+            // Verifica si todos los miembros han visto el Inbox antes de marcar los mensajes como leídos
+            const allSeen = members.every(member => member.isSeen || member.user_id === host_id);
+        
+            if (allSeen) {
+                // Si todos los miembros han visto el Inbox, marca todos los mensajes como leídos
+                await supabase
+                    .from('messages')
+                    .update({ isRead: true })
+                    .match({ inbox_id: inboxId, isRead: false });
+            }
+
+            return { data: allSeen };
+        }
+    } catch (error) {
+        console.error('[ ERROR updateMessagesRead ]', error);
+        return { data: null };
+    }
+}
+
+export async function handleMessageReceived(message, is_group, host_id, isInboxOpen) {
+
+    const supabase = createServerActionClient({ cookies });
+
+    const inboxId = message.inbox_id;
+    const sender_id = message.user_id;
+  
+    if (!isInboxOpen) {
+        try {
+            // ACTUALIZA EL INBOX del host_id con isSeen a FALSE porque el Inbox no está abierto
+            const { error } = await supabase
+                .from('inbox_members')
+                .update({ isSeen: false })
+                .match({ inbox_id: inboxId, user_id: host_id, isSeen: true });
+            
+            if (error) throw new Error(error.message);
+            return { data: null };
+
+        } catch (error) {
+            console.error('[ ERROR handleMessageReceived ]', error);
+            return { data: null };
+        }
+    } else {
+        // ACTUALIZA EL INBOX del host_id con isSeen a TRUE porque el Inbox está abierto
+        const { data } = await updateMessagesToRead(sender_id, inboxId, host_id, is_group);
+
+        console.log(data)
+        return { data }
     }
 }

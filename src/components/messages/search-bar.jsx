@@ -3,8 +3,12 @@
 import { FiSearch } from "react-icons/fi"
 import React from "react";
 import { Input } from "../ui/input";
+import { useMessages } from "@/hooks/useGlobal";
 
-export default function SearchBarInbox({ data, onSearch = () => {} }) {
+export default function SearchBarInbox({ onSearch = () => {} }) {
+
+    // GET
+    const dataInboxes = useMessages((state) => state.dataInboxes)
 
     // ref del input
     const inputRef = React.useRef(null)
@@ -13,14 +17,14 @@ export default function SearchBarInbox({ data, onSearch = () => {} }) {
     //estado de la busqueda
     const handleSearch = (value) => {
         setSearch(value)
-        onSearch(data.filter(item => item.contacts[0].user_name.toLowerCase().includes(value.toLowerCase())))
+        onSearch(dataInboxes.filter(item => item.contacts[0].user_name.toLowerCase().includes(value.toLowerCase())))
     }
 
     // estado de Cancelar busqueda
     const cancelSearch = () => {
         inputRef.current.value = ''
         setSearch('')
-        onSearch(data)
+        onSearch(dataInboxes)
     }
 
     return (

@@ -6,15 +6,89 @@ import { LuWarehouse } from "react-icons/lu";
 import { TbArrowsExchange2 } from "react-icons/tb";
 import { FiSearch } from "react-icons/fi";
 import { BiMessageSquareDetail } from "react-icons/bi";
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { handleMessageReceived } from '@/lib/action';
+import { fetchInboxesUnread } from '@/lib/data';
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useMessages } from '@/hooks/useGlobal';
 
-export default function FooterBar() {
+// actulizamos el Inboxes y la BD cuando Realtime capta un nuevo mensaje
+const updateDataInbox = async (message, idHost, isInboxOpen) => {
 
+    try {
+        // Actualizar los mensajes no leidos en la BD
+        const { error } = await handleMessageReceived(message, false, idHost, isInboxOpen);
+        if (error) throw new Error(error);
+
+    } catch (error) {
+        console.error('[ ERROR updateUnreadMessages ]', error);
+    }
+}
+
+// obtener la cantidad de inbox sin leer
+const getCountInboxesUnread = async ({ user_id, setNotificationsInboxes }) => {
+    const { data: countInboxesUnread } = await fetchInboxesUnread({ user_id });
+    setNotificationsInboxes(countInboxesUnread || 0);
+}
+
+export default function FooterBar({ idHost }) {
+
+    // GET
+    const dataInboxes = useMessages((state) => state.dataInboxes);
+    const notificationsInboxes = useMessages((state) => state.notificationsInboxes);
+    const inboxOpen = useMessages((state) => state.inboxOpen);
+
+    // SET
+    const setNewMessagesInboxes = useMessages((state) => state.setNewMessagesInboxes);
+    const setNotificationsInboxes = useMessages((state) => state.setNotificationsInboxes);
+    const setNotificationsMessages = useMessages((state) => state.setNotificationsMessages);
+    const setInboxOpen = useMessages((state) => state.setInboxOpen);
+
+    // OTHER STATES
+    const supabase = createClientComponentClient();
     const pathDefault = usePathname();
     const [path, setPath] = React.useState(pathDefault);
+
+    // escuchando nuevos mensajes Realtime
+    useEffect(() => {
+        getCountInboxesUnread({ user_id: idHost, setNotificationsInboxes });
+    }, []);
+
+    useEffect(() => {
+        setInboxOpen({})
+    }, [path, idHost, setInboxOpen]);
+
+    // Realtime
+    useEffect(() => {
+        const channel = supabase.channel('realtime-inboxes')
+            .on('postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'messages' }, 
+                (payload) => {
+                    setNewMessagesInboxes({inbox_id: payload.new.inbox_id, lastMessage_content: payload.new.content, lastMessage_time: payload.new.created_at});
+
+                    if (payload.new.user_id !== idHost) {
+                        updateDataInbox(payload.new, idHost, Object.keys(inboxOpen).length > 0 ? true : false);
+                        getCountInboxesUnread({ user_id: idHost, setNotificationsInboxes });
+                        setNotificationsMessages(idHost)
+                    }
+                    
+                }
+            )
+            .on('postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'inbox_members' },
+                (payload) => {
+                    if (payload.new.user_id === idHost) {
+                        getCountInboxesUnread({ user_id: idHost, setNotificationsInboxes })
+                    };
+                }
+            )
+            .subscribe();
+
+        return () => supabase.removeChannel(channel);
+    }, [idHost, dataInboxes]); 
 
     const allLinks = [
         {
@@ -61,13 +135,23 @@ export default function FooterBar() {
                                     <TooltipTrigger>
                                         <Link 
                                             href={link.path}
-                                            onClick={() => setPath(link.path)}
+                                            onClick={() => {
+                                                setPath(link.path)
+                                            }}
                                             className={cn(
-                                                "hover:text-gray-500",
+                                                "hover:text-gray-500 relative",
                                                 (path === link.path ? ' text-gray-500 animate-pulse' : '')
                                             )}
                                             >
                                                 <link.icon size={link.size}/>
+                                                {
+                                                    (link.name === 'messages' && notificationsInboxes > 0) && 
+                                                        <span 
+                                                            className='bg-blue-600 rounded-full px-2 text-[12px] font-bold absolute -top-1 -right-1'
+                                                            >
+                                                                {notificationsInboxes}
+                                                        </span>
+                                                }
                                         </Link>
                                     </TooltipTrigger>
 

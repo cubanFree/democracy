@@ -12,7 +12,7 @@ export default async function ProfileDesign() {
 
     const supabase = createServerComponentClient({ cookies });
     const { data: { user } } = await supabase.auth.getUser();
-    const { data } = await fetchProfileData(user?.id, 'users', ['avatar_url']);
+    const { data } = await fetchProfileData({ filter: {id: user?.id}, table: 'users', caseBox: ['avatar_url'] });
 
     const allLists = [
         {

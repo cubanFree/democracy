@@ -14,17 +14,18 @@ import moment from "moment";
 import { toast } from "sonner";
 import { create_message } from "@/lib/action";
 import { FiLoader } from "react-icons/fi";
+import { useMessages } from "@/hooks/useGlobal";
 // import BtnScrollDown from "./btn-scrollDown";
 
-export default function ChatBox(
-    { 
-        idHost, 
-        supabase, 
-        data, 
-        onClose = () => {},
-    }
-) {
+export default function ChatBox({ idHost, supabase }) {
 
+    // SET
+    const setInboxOpen = useMessages((state) => state.setInboxOpen);
+
+    // GET
+    const inboxOpen = useMessages((state) => state.inboxOpen);
+
+    // OTHER STATES
     const bodyScrollRef = useRef(null);
     const inputRef = useRef(null);
 
@@ -34,15 +35,16 @@ export default function ChatBox(
 
     // estado para obtener los mensajes
     useEffect(() => {
-        if (!data[0]?.inbox_id) return;
+        if (!inboxOpen.inbox_id) return;
+
         const getMessages = async () => {
-            const { data: content_messages } = await fetchMessages(data[0].inbox_id);
+            const { data: content_messages } = await fetchMessages(inboxOpen.inbox_id);
             setMessages(content_messages);
             setLoadingMessages(false);
         }
-
         getMessages();
-    }, [data]);
+
+    }, [inboxOpen]);
 
     // escuchando nuevos mensajes Realtime
     useEffect(() => {
@@ -50,12 +52,12 @@ export default function ChatBox(
             { event: 'INSERT', schema: 'public', table: 'messages' }, 
             (payload) => {
                 // cuando enviamos un nuevo mensaje, cambiamos el estado del inbox con el nuevo mensaje
-                data[0]?.inbox_id === payload.new.inbox_id && setMessages((prev) => [...prev, payload.new]);
+                inboxOpen.inbox_id === payload.new.inbox_id && setMessages((prev) => [...prev, payload.new]);
             }
         ).subscribe();
 
         return () => supabase.removeChannel(channel);
-    }, [messages, supabase]);
+    }, [messages]);
 
     // estado para hacer scroll automatico
     useEffect(() => {
@@ -64,15 +66,14 @@ export default function ChatBox(
         }
     }, [messages]);
 
-
     // estado para enviar un nuevo mensaje
     const sendMessage = async (formData) => {
         setLoadingSendMessage(true);
         try {
-            if (!data[0]?.inbox_id || formData.get('content_text') === '') throw new Error('Inbox_id or Content not found');
-            const { error } = await create_message({ inbox_id: data[0]?.inbox_id, content_text: {user_id: idHost, message: formData.get('content_text')} });
+            if (!inboxOpen.inbox_id || formData.get('content_text') === '') throw new Error('Inbox_id or Content not found');
+            const { rejected, error } = await create_message(inboxOpen.inbox_id, {user_id: idHost, message: formData.get('content_text')}, inboxOpen.contacts.map((c) => c.user_id) || []);
 
-            if (error) throw new Error(error);
+            if (error || rejected) throw new Error(error);
 
         } catch (error) {
             setLoadingSendMessage(false);
@@ -88,13 +89,13 @@ export default function ChatBox(
             {/* Opciones de la caja de mensaje */}
             <div className="w-full h-full flex items-center justify-between border-b-2 border-gray-500 p-2">
                 { messages?.length > 0 && <MdOutlineDelete size={20} /> }
-                <MdOutlineClear className="cursor-pointer" size={20} onClick={() => onClose([])}/>
+                <MdOutlineClear className="cursor-pointer" size={20} onClick={() => setInboxOpen({})}/>
             </div>
 
             {/* Avatar y datos */}
             <div className="w-full flex items-start gap-4 p-2">
                 <Image 
-                    src={data[0]?.avatar || '/avatar_default.jpg'}
+                    src={inboxOpen.avatar || '/avatar_default.jpg'}
                     alt="avatar message"
                     width={500}
                     height={500}
@@ -102,8 +103,8 @@ export default function ChatBox(
                     className="object-cover w-11 h-11 rounded-xl"
                 />
                 <div className="w-full flex justify-between items-center gap-1">
-                    <span className="text-lg">{data[0]?.chat_name}</span>
-                    <span className="text-sm text-gray-400">{data[0]?.lastMessage_time}</span>
+                    <span className="text-lg">{inboxOpen.chat_name}</span>
+                    <span className="text-sm text-gray-400">{inboxOpen.lastMessage_time}</span>
                 </div>
             </div>
 
@@ -210,7 +211,7 @@ export default function ChatBox(
                             name="content_text"
                             className="w-full text-sm bg-origin border border-gray-600 rounded-lg p-2 h-10"
                             type="text"
-                            placeholder={"reply to " + data[0]?.chat_name + "..."}
+                            placeholder={"reply to " + inboxOpen.chat_name + "..."}
                             autoComplete="off"
                             ref={inputRef}
                             required
