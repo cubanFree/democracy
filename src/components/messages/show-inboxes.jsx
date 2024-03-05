@@ -14,7 +14,6 @@ const handleOpenInbox = async ({ item, date, idHost, setInboxOpen }) => {
     try {
         // Actualizar los mensajes no leidos en la BD
         const { data } = await updateMessagesToRead(item.contacts[0].user_id, item.inbox_id, idHost, item.is_group);
-        console.log(data)
 
     } catch (error) {
         console.error('[ ERROR updateUnreadMessages ]', error);
@@ -49,7 +48,7 @@ export default function ShowInboxes({ idHost }) {
                 </div>
             ) : (
                 dataInboxes.map((item) => {
-                    const date = moment(item.lastMessage_time).format('hh:mm:ss A');
+                    const date = moment(item.lastMessage_time).format('hh:mm A');
                     const get_unread = notificacionesMessages.filter(inbox => inbox.inbox_id === item.inbox_id);
                     const { unread_total } = get_unread[0] || 0;
                     return (
@@ -70,11 +69,11 @@ export default function ShowInboxes({ idHost }) {
                                 <div className="w-full flex flex-col justify-between gap-1 truncate">
                                     <div className="w-full flex justify-between">
                                         <span className="text-lg">{!item.is_group ? item.contacts[0].user_name : item.title_inbox}</span>
-                                        <span className="text-sm text-gray-400">{date}</span>
+                                        <span className={cn("text-sm text-gray-400", unread_total && "text-blue-400")}>{date}</span>
                                     </div>
                                     <div className="w-full flex justify-between text-sm text-gray-400 truncate">
                                         <span className={cn("w-full truncate", unread_total && "italic")}>{item.lastMessage_content}</span>
-                                        { unread_total ? <span className="bg-blue-800 rounded-full px-2 text-[12px] font-bold">{unread_total}</span> : null }
+                                        { unread_total ? <span className="bg-blue-600 text-gray-300 rounded-full px-2 text-[12px] font-bold">{unread_total}</span> : null }
                                     </div>
                                 </div>
                             </div>

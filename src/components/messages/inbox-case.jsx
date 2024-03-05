@@ -31,14 +31,14 @@ export default function InboxCase({ idHost }) {
     return (
         <div className={cn(
                 "grid w-full h-full grid-rows-1 overflow-hidden",
-                Object.keys(inboxOpen).length ? 'md:grid-cols-2' : 'grid-cols-1'
+                inboxOpen ? 'md:grid-cols-2' : 'grid-cols-1'
             )}
         >
             {/* lista de inboxs */}
             <div 
                 className={cn(
                     "w-full h-full scroll-custom relative",
-                    Object.keys(inboxOpen).length ? 'hidden md:flex md:flex-col' : 'flex flex-col'
+                    inboxOpen ? 'hidden md:flex md:flex-col' : 'flex flex-col'
                 )}
             >
                 {
@@ -61,7 +61,7 @@ export default function InboxCase({ idHost }) {
             {/* messages */}
             <div className={cn(
                     "w-full h-full overflow-hidden",
-                    Object.keys(inboxOpen).length ? 'md:border-l-2 md:border-gray-500 z-0' : 'hidden'
+                    inboxOpen ? 'md:border-l-2 md:border-gray-500 z-0' : 'hidden'
                 )}
             >
                 <ChatBox idHost={idHost} supabase={supabase} />

@@ -7,7 +7,7 @@ export const useMessages = create((set, get) => ({
     isLoading: true,
     notificationsInboxes: 0,
     notificacionesMessages: [],
-    inboxOpen: {},
+    inboxOpen: null,
     dataInboxes: [],
     setDataInboxes: async () => {
         const { data } = await fetchInbox();

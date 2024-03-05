@@ -37,7 +37,6 @@ const getCountInboxesUnread = async ({ user_id, setNotificationsInboxes }) => {
 export default function FooterBar({ idHost }) {
 
     // GET
-    const dataInboxes = useMessages((state) => state.dataInboxes);
     const notificationsInboxes = useMessages((state) => state.notificationsInboxes);
     const inboxOpen = useMessages((state) => state.inboxOpen);
 
@@ -50,16 +49,18 @@ export default function FooterBar({ idHost }) {
     // OTHER STATES
     const supabase = createClientComponentClient();
     const pathDefault = usePathname();
-    const [path, setPath] = React.useState(pathDefault);
 
     // escuchando nuevos mensajes Realtime
     useEffect(() => {
         getCountInboxesUnread({ user_id: idHost, setNotificationsInboxes });
-    }, []);
+    }, [idHost, setNotificationsInboxes]);
 
     useEffect(() => {
-        setInboxOpen({})
-    }, [path, idHost, setInboxOpen]);
+        if (pathDefault !== '/messages/inbox') {
+            setInboxOpen(null);
+        }
+    }, [pathDefault, setInboxOpen]);
+    
 
     // Realtime
     useEffect(() => {
@@ -70,7 +71,7 @@ export default function FooterBar({ idHost }) {
                     setNewMessagesInboxes({inbox_id: payload.new.inbox_id, lastMessage_content: payload.new.content, lastMessage_time: payload.new.created_at});
 
                     if (payload.new.user_id !== idHost) {
-                        updateDataInbox(payload.new, idHost, Object.keys(inboxOpen).length > 0 ? true : false);
+                        updateDataInbox(payload.new, idHost, inboxOpen !== null ? true : false);
                         getCountInboxesUnread({ user_id: idHost, setNotificationsInboxes });
                         setNotificationsMessages(idHost)
                     }
@@ -88,7 +89,7 @@ export default function FooterBar({ idHost }) {
             .subscribe();
 
         return () => supabase.removeChannel(channel);
-    }, [idHost, dataInboxes]); 
+    }, [idHost, supabase, inboxOpen, pathDefault, setInboxOpen, setNewMessagesInboxes, setNotificationsInboxes, setNotificationsMessages]); 
 
     const allLinks = [
         {
@@ -135,12 +136,9 @@ export default function FooterBar({ idHost }) {
                                     <TooltipTrigger>
                                         <Link 
                                             href={link.path}
-                                            onClick={() => {
-                                                setPath(link.path)
-                                            }}
                                             className={cn(
                                                 "hover:text-gray-500 relative",
-                                                (path === link.path ? ' text-gray-500 animate-pulse' : '')
+                                                (pathDefault === link.path ? ' text-gray-500 animate-pulse' : '')
                                             )}
                                             >
                                                 <link.icon size={link.size}/>

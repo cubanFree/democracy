@@ -15,6 +15,8 @@ import { toast } from "sonner";
 import { create_message } from "@/lib/action";
 import { FiLoader } from "react-icons/fi";
 import { useMessages } from "@/hooks/useGlobal";
+import { IoCheckmarkOutline } from "react-icons/io5";
+import { IoCheckmarkDoneOutline } from "react-icons/io5";
 // import BtnScrollDown from "./btn-scrollDown";
 
 export default function ChatBox({ idHost, supabase }) {
@@ -35,11 +37,12 @@ export default function ChatBox({ idHost, supabase }) {
 
     // estado para obtener los mensajes
     useEffect(() => {
-        if (!inboxOpen.inbox_id) return;
+        if (!inboxOpen?.inbox_id) return;
 
         const getMessages = async () => {
-            const { data: content_messages } = await fetchMessages(inboxOpen.inbox_id);
+            const { data: content_messages } = await fetchMessages(inboxOpen?.inbox_id);
             setMessages(content_messages);
+
             setLoadingMessages(false);
         }
         getMessages();
@@ -48,13 +51,28 @@ export default function ChatBox({ idHost, supabase }) {
 
     // escuchando nuevos mensajes Realtime
     useEffect(() => {
-        const channel = supabase.channel('realtime-messages').on('postgres_changes',
-            { event: 'INSERT', schema: 'public', table: 'messages' }, 
-            (payload) => {
-                // cuando enviamos un nuevo mensaje, cambiamos el estado del inbox con el nuevo mensaje
-                inboxOpen.inbox_id === payload.new.inbox_id && setMessages((prev) => [...prev, payload.new]);
-            }
-        ).subscribe();
+        const channel = supabase.channel('realtime-messages')
+            .on('postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'messages' }, 
+                (payload) => {
+                    // cuando enviamos un nuevo mensaje, cambiamos el estado del inbox con el nuevo mensaje
+                    inboxOpen?.inbox_id === payload.new.inbox_id && setMessages((prev) => [...prev, payload.new]);
+                }
+            )
+            .on('postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'messages' },
+                (payload) => {
+                    // escuchando actualizaciones si se ha leido el mensaje
+                    if (payload.new.user_id === idHost) {
+                        const index = messages.findIndex((m) => m.id === payload.new.id);
+                        if (index !== -1) {
+                            messages[index] = payload.new;
+                            setMessages([...messages]);
+                        }
+                    };
+                }
+            )
+            .subscribe();
 
         return () => supabase.removeChannel(channel);
     }, [messages]);
@@ -70,8 +88,8 @@ export default function ChatBox({ idHost, supabase }) {
     const sendMessage = async (formData) => {
         setLoadingSendMessage(true);
         try {
-            if (!inboxOpen.inbox_id || formData.get('content_text') === '') throw new Error('Inbox_id or Content not found');
-            const { rejected, error } = await create_message(inboxOpen.inbox_id, {user_id: idHost, message: formData.get('content_text')}, inboxOpen.contacts.map((c) => c.user_id) || []);
+            if (!inboxOpen?.inbox_id || formData.get('content_text') === '') throw new Error('Inbox_id or Content not found');
+            const { rejected, error } = await create_message(inboxOpen?.inbox_id, {user_id: idHost, message: formData.get('content_text')}, inboxOpen.contacts.map((c) => c.user_id) || []);
 
             if (error || rejected) throw new Error(error);
 
@@ -89,13 +107,13 @@ export default function ChatBox({ idHost, supabase }) {
             {/* Opciones de la caja de mensaje */}
             <div className="w-full h-full flex items-center justify-between border-b-2 border-gray-500 p-2">
                 { messages?.length > 0 && <MdOutlineDelete size={20} /> }
-                <MdOutlineClear className="cursor-pointer" size={20} onClick={() => setInboxOpen({})}/>
+                <MdOutlineClear className="cursor-pointer" size={20} onClick={() => setInboxOpen(null)}/>
             </div>
 
             {/* Avatar y datos */}
             <div className="w-full flex items-start gap-4 p-2">
                 <Image 
-                    src={inboxOpen.avatar || '/avatar_default.jpg'}
+                    src={inboxOpen?.avatar || '/avatar_default.jpg'}
                     alt="avatar message"
                     width={500}
                     height={500}
@@ -103,8 +121,8 @@ export default function ChatBox({ idHost, supabase }) {
                     className="object-cover w-11 h-11 rounded-xl"
                 />
                 <div className="w-full flex justify-between items-center gap-1">
-                    <span className="text-lg">{inboxOpen.chat_name}</span>
-                    <span className="text-sm text-gray-400">{inboxOpen.lastMessage_time}</span>
+                    <span className="text-lg">{inboxOpen?.chat_name}</span>
+                    <span className="text-sm text-gray-400">{inboxOpen?.lastMessage_time}</span>
                 </div>
             </div>
 
@@ -121,7 +139,7 @@ export default function ChatBox({ idHost, supabase }) {
                             <article className="w-full flex flex-col gap-2">
                                 {
                                     messages.map((item) => {
-                                        const date = moment(item.created_at).format('hh:mm:ss A')
+                                        const date = moment(item.created_at).format('hh:mm A')
                                         return (
                                             <div
                                                 key={item.id}
@@ -155,11 +173,20 @@ export default function ChatBox({ idHost, supabase }) {
                                                                 )}
                                                                 >
                                                                     <span className="w-full">{item.content}</span>
-                                                                    <span
-                                                                        className="w-full text-end text-[0.7rem] text-gray-400"
+                                                                    <div
+                                                                        className="w-full text-end flex gap-1 items-center"
                                                                         >
-                                                                            {date}
-                                                                    </span>
+                                                                            <span className='text-[0.7rem] text-gray-400'>{date}</span>
+                                                                            {
+                                                                                item.user_id === idHost && (
+                                                                                    item.isRead ? (
+                                                                                        <IoCheckmarkDoneOutline size={15} className="text-emerald-500" />
+                                                                                    ) : (
+                                                                                        <IoCheckmarkOutline size={15} />
+                                                                                    )
+                                                                                )
+                                                                            }
+                                                                    </div>
                                                             </span>
                                                         )
                                                     }
@@ -211,7 +238,7 @@ export default function ChatBox({ idHost, supabase }) {
                             name="content_text"
                             className="w-full text-sm bg-origin border border-gray-600 rounded-lg p-2 h-10"
                             type="text"
-                            placeholder={"reply to " + inboxOpen.chat_name + "..."}
+                            placeholder={"reply to " + inboxOpen?.chat_name + "..."}
                             autoComplete="off"
                             ref={inputRef}
                             required

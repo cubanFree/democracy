@@ -267,7 +267,7 @@ export async function updateMessagesToRead(sender_id, inboxId, host_id, is_group
 
             if (error) throw new Error(error.message);
 
-            return { data: null };
+            return { data: true };
 
         } else {
             // EN LOS GRUPOS, chequeamos a cada usuario con el inbox_id si tiene isSeen en TRUE
