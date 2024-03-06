@@ -171,12 +171,12 @@ export async function fetchInboxesUnread({ user_id }) {
 
         const { data: members, error } = await supabase
             .from('inbox_members')
-            .select('isSeen')
+            .select('is_seen')
             .eq('user_id', user_id);
 
         if (error) throw new Error(error.message);
 
-        const data = members.filter((member) => !member.isSeen).length;
+        const data = members.filter((member) => !member.is_seen).length;
 
         return { data };
 

@@ -134,8 +134,8 @@ export async function create_message(inbox_id, content_text, contacts_id) { // c
         const preparedContacts = contacts_id.map(async (id) => {
             await supabase
                 .from('inbox_members')
-                .update({ isSeen: false })
-                .match({ inbox_id, user_id: id, isSeen: true })
+                .update({ is_seen: false })
+                .match({ inbox_id, user_id: id, is_seen: true })
         });
 
         const results = await Promise.allSettled(preparedContacts);
@@ -253,8 +253,8 @@ export async function updateMessagesToRead(sender_id, inboxId, host_id, is_group
 
         const { error } = await supabase
             .from('inbox_members')
-            .update({ isSeen: true })
-            .match({ inbox_id: inboxId, user_id: host_id, isSeen: false });
+            .update({ is_seen: true })
+            .match({ inbox_id: inboxId, user_id: host_id, is_seen: false });
 
         if (error) throw new Error(error.message);
 
@@ -275,13 +275,13 @@ export async function updateMessagesToRead(sender_id, inboxId, host_id, is_group
             // Obtiene todos los miembros del Inbox (grupo)
             const { data: members, error } = await supabase
                 .from('inbox_members')
-                .select('user_id, isSeen')
+                .select('user_id, is_seen')
                 .eq('inbox_id', inboxId);
 
             if (error) throw new Error('Error fetching inbox members:', error.message);
 
             // Verifica si todos los miembros han visto el Inbox antes de marcar los mensajes como leídos
-            const allSeen = members.every(member => member.isSeen || member.user_id === host_id);
+            const allSeen = members.every(member => member.is_seen || member.user_id === host_id);
         
             if (allSeen) {
                 // Si todos los miembros han visto el Inbox, marca todos los mensajes como leídos
@@ -311,8 +311,8 @@ export async function handleMessageReceived(message, is_group, host_id, isInboxO
             // ACTUALIZA EL INBOX del host_id con isSeen a FALSE porque el Inbox no está abierto
             const { error } = await supabase
                 .from('inbox_members')
-                .update({ isSeen: false })
-                .match({ inbox_id: inboxId, user_id: host_id, isSeen: true });
+                .update({ is_seen: false })
+                .match({ inbox_id: inboxId, user_id: host_id, is_seen: true });
             
             if (error) throw new Error(error.message);
             return { data: null };
