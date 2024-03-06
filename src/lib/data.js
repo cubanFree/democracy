@@ -77,7 +77,7 @@ export async function fetchInbox() {
             // Obtener el último mensaje de cada inbox
             const { data: messages, error: messagesError } = await supabase
                 .from('messages')
-                .select('content, created_at, user_id')
+                .select('content, created_at, user_id, isRead')
                 .eq('inbox_id', inbox_id)
                 .order('created_at', { ascending: false })
                 .limit(1);
@@ -125,8 +125,7 @@ export async function fetchInbox() {
                 title_inbox: inbox.title_inbox,
                 avatar_group: inbox.avatar_group,
                 contacts: [...contactsInfo],
-                lastMessage_content: lastMessage ? lastMessage.content : "",
-                lastMessage_time: lastMessage ? lastMessage.created_at : "",
+                lastMessage: lastMessage || null,
             };
         }));
 

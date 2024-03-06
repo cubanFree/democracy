@@ -14,13 +14,13 @@ export const useMessages = create((set, get) => ({
         set({ dataInboxes: data });
         set((state) => ({ ...state, isLoading: false }));
     },
-    setNewMessagesInboxes: (value) => {
+    setNewMessagesInboxes: ({ inbox_id, lastMessage }) => {
         const { dataInboxes } = get();
         if (!dataInboxes.length) return;
 
         const updateDataInboxes = dataInboxes.map(inbox => {
-            if (inbox.inbox_id === value.inbox_id) {
-                return { ...inbox, lastMessage_content: value.lastMessage_content, lastMessage_time: value.lastMessage_time };
+            if (inbox.inbox_id === inbox_id) {
+                return { ...inbox, lastMessage };
             }
             return inbox;
         })

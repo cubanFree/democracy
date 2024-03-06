@@ -26,7 +26,7 @@ export default function InboxCase({ idHost }) {
     useEffect(() => {
         setDataInboxes()
         setNotificationsMessages(idHost)
-    }, [idHost, handleSearch, inboxOpen, isLoading, setHandleSearch, setDataInboxes]);
+    }, [idHost, handleSearch, inboxOpen, isLoading, setHandleSearch, setDataInboxes, setNotificationsMessages]);
 
     return (
         <div className={cn(
@@ -52,7 +52,7 @@ export default function InboxCase({ idHost }) {
                             <SearchBarInbox onSearch={setHandleSearch} />
 
                             {/* inboxs list */}
-                            <ShowInboxes idHost={idHost} />
+                            <ShowInboxes idHost={idHost} supabase={supabase} />
                         </>
                     )
                 }

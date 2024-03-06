@@ -21,11 +21,13 @@ import { IoCheckmarkDoneOutline } from "react-icons/io5";
 
 export default function ChatBox({ idHost, supabase }) {
 
-    // SET
-    const setInboxOpen = useMessages((state) => state.setInboxOpen);
-
     // GET
     const inboxOpen = useMessages((state) => state.inboxOpen);
+    const dataInboxes = useMessages((state) => state.dataInboxes);
+
+    // SET
+    const setInboxOpen = useMessages((state) => state.setInboxOpen);
+    const setDataInboxes = useMessages((state) => state.setDataInboxes);
 
     // OTHER STATES
     const bodyScrollRef = useRef(null);
@@ -42,7 +44,6 @@ export default function ChatBox({ idHost, supabase }) {
         const getMessages = async () => {
             const { data: content_messages } = await fetchMessages(inboxOpen?.inbox_id);
             setMessages(content_messages);
-
             setLoadingMessages(false);
         }
         getMessages();
@@ -64,12 +65,13 @@ export default function ChatBox({ idHost, supabase }) {
                 (payload) => {
                     // escuchando actualizaciones si se ha leido el mensaje
                     if (payload.new.user_id === idHost) {
+                        // cambiar el estado de isRead
                         const index = messages.findIndex((m) => m.id === payload.new.id);
                         if (index !== -1) {
                             messages[index] = payload.new;
                             setMessages([...messages]);
                         }
-                    };
+                    }
                 }
             )
             .subscribe();
@@ -174,7 +176,7 @@ export default function ChatBox({ idHost, supabase }) {
                                                                 >
                                                                     <span className="w-full">{item.content}</span>
                                                                     <div
-                                                                        className="w-full text-end flex gap-1 items-center"
+                                                                        className="w-full justify-end flex gap-1 items-center"
                                                                         >
                                                                             <span className='text-[0.7rem] text-gray-400'>{date}</span>
                                                                             {

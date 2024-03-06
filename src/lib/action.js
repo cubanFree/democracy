@@ -113,12 +113,12 @@ export async function changeStatus(status) {
     }
 }
 
-export async function create_message(inbox_id, content_text, contacts_id, isInboxOpen) { // contacts [user_id1, user_id2, ...]
+export async function create_message(inbox_id, content_text, contacts_id) { // contacts [user_id1, user_id2, ...]
 
     const supabase = createServerActionClient({ cookies });
 
     try {
-        if (!inbox_id || !content_text.message || !content_text.user_id) throw new Error('Missing parameters.');
+        if (!inbox_id || !content_text?.message || !content_text?.user_id) throw new Error('Missing parameters.');
 
         // crtear un nuevo message
         const { error: errorCreateMessage } = await supabase
@@ -212,7 +212,7 @@ export async function create_inbox({user_id1, user_id2, content_text, avatar_gro
             }
 
             // Agregar el mensaje a la conversacion existente
-            const { error: errorCreate_Message } = await create_message({ inbox_id, content_text });
+            const { error: errorCreate_Message } = await create_message(inbox_id, { user_id: content_text.user_id, message: content_text.message }, [user_id2] );
             if (errorCreate_Message) throw new Error(errorCreate_Message);
         }
 

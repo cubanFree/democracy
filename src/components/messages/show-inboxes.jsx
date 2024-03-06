@@ -1,12 +1,13 @@
 'use client';
 
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { RiCloudOffLine } from "react-icons/ri";
 import moment from "moment";
 import { cn } from "@/lib/utils";
 import { updateMessagesToRead } from "@/lib/action";
 import { useMessages } from "@/hooks/useGlobal";
+import { IoCheckmarkDoneOutline, IoCheckmarkOutline } from "react-icons/io5";
 
 // Actualizar el estado local para marcar los mensajes como leídos
 const handleOpenInbox = async ({ item, date, idHost, setInboxOpen }) => {
@@ -32,7 +33,7 @@ const handleOpenInbox = async ({ item, date, idHost, setInboxOpen }) => {
     );
 };
 
-export default function ShowInboxes({ idHost }) {
+export default function ShowInboxes({ idHost, supabase }) {
 
     // GET
     const dataInboxes = useMessages((state) => state.dataInboxes)
@@ -40,6 +41,29 @@ export default function ShowInboxes({ idHost }) {
 
     // SET
     const setInboxOpen = useMessages((state) => state.setInboxOpen);
+    const setDataInboxes = useMessages((state) => state.setDataInboxes);
+
+    useEffect(() => {
+        const channel = supabase.channel('realtime-Inboxes')
+            .on('postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'messages' },
+                (payload) => {
+                    // escuchando actualizaciones si se ha leido el mensaje
+                    if (payload.new.user_id === idHost) {
+                        // cambiar el estado del Inbox
+                        console.log('payload.new')
+                        const indexInbox = dataInboxes.findIndex((i) => i.inbox_id === payload.new.inbox_id);
+                        if (indexInbox !== -1) {
+                            dataInboxes[indexInbox] = {...dataInboxes[indexInbox], lastMessage: payload.new}
+                            setDataInboxes([...dataInboxes]);
+                        }
+                    }
+                }
+            )
+            .subscribe();
+
+        return () => supabase.removeChannel(channel);
+    }, [idHost, supabase, dataInboxes, setDataInboxes]);
 
     return !dataInboxes.length ? (
                 <div className="w-full h-full flex flex-col justify-center items-center">
@@ -48,9 +72,9 @@ export default function ShowInboxes({ idHost }) {
                 </div>
             ) : (
                 dataInboxes.map((item) => {
-                    const date = moment(item.lastMessage_time).format('hh:mm A');
-                    const get_unread = notificacionesMessages.filter(inbox => inbox.inbox_id === item.inbox_id);
-                    const { unread_total } = get_unread[0] || 0;
+                    const date = moment(item.lastMessage?.created_at).format('hh:mm A');
+                    const get_unread = notificacionesMessages?.filter(inbox => inbox.inbox_id === item.inbox_id) || [];
+                    const { unread_total } = get_unread.length ? get_unread[0] : 0;
                     return (
                         <div 
                             key={item.inbox_id}
@@ -72,7 +96,22 @@ export default function ShowInboxes({ idHost }) {
                                         <span className={cn("text-sm text-gray-400", unread_total && "text-blue-400")}>{date}</span>
                                     </div>
                                     <div className="w-full flex justify-between text-sm text-gray-400 truncate">
-                                        <span className={cn("w-full truncate", unread_total && "italic")}>{item.lastMessage_content}</span>
+                                        <span 
+                                            className={cn(
+                                                "w-full truncate flex gap-1 items-center", unread_total && "italic"
+                                            )}
+                                        >
+                                            {
+                                                item.lastMessage?.user_id === idHost && (
+                                                    item.lastMessage?.isRead ? (
+                                                        <IoCheckmarkDoneOutline size={15} className="text-emerald-500" />
+                                                    ) : (
+                                                        <IoCheckmarkOutline size={15} />
+                                                    )
+                                                )
+                                            }
+                                            {item.lastMessage?.content}
+                                        </span>
                                         { unread_total ? <span className="bg-blue-600 text-gray-300 rounded-full px-2 text-[12px] font-bold">{unread_total}</span> : null }
                                     </div>
                                 </div>

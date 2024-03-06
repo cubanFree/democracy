@@ -45,6 +45,7 @@ export default function FooterBar({ idHost }) {
     const setNotificationsInboxes = useMessages((state) => state.setNotificationsInboxes);
     const setNotificationsMessages = useMessages((state) => state.setNotificationsMessages);
     const setInboxOpen = useMessages((state) => state.setInboxOpen);
+    const setDataInboxes = useMessages((state) => state.setDataInboxes);
 
     // OTHER STATES
     const supabase = createClientComponentClient();
@@ -68,7 +69,7 @@ export default function FooterBar({ idHost }) {
             .on('postgres_changes',
                 { event: 'INSERT', schema: 'public', table: 'messages' }, 
                 (payload) => {
-                    setNewMessagesInboxes({inbox_id: payload.new.inbox_id, lastMessage_content: payload.new.content, lastMessage_time: payload.new.created_at});
+                    setNewMessagesInboxes({inbox_id: payload.new.inbox_id, lastMessage: payload.new});
 
                     if (payload.new.user_id !== idHost) {
                         updateDataInbox(payload.new, idHost, inboxOpen !== null ? true : false);
@@ -86,10 +87,19 @@ export default function FooterBar({ idHost }) {
                     };
                 }
             )
+            .on('postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'inbox_members' },
+                (payload) => {
+                    if (payload.new.user_id === idHost) {
+                        setDataInboxes()
+                        setNotificationsMessages(idHost)
+                    };
+                }
+            )
             .subscribe();
 
         return () => supabase.removeChannel(channel);
-    }, [idHost, supabase, inboxOpen, pathDefault, setInboxOpen, setNewMessagesInboxes, setNotificationsInboxes, setNotificationsMessages]); 
+    }, [idHost, supabase, inboxOpen, pathDefault, setInboxOpen, setNewMessagesInboxes, setNotificationsInboxes, setNotificationsMessages, setDataInboxes]); 
 
     const allLinks = [
         {
