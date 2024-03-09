@@ -9,10 +9,16 @@ export const useMessages = create((set, get) => ({
     notificacionesMessages: [],
     inboxOpen: null,
     dataInboxes: [],
+    dataSearch: [],
     setDataInboxes: async () => {
         const { data } = await fetchInbox();
         set({ dataInboxes: data });
         set((state) => ({ ...state, isLoading: false }));
+    },
+    setDataSearch: (value) => {
+        const { dataInboxes } = get();
+        const search = dataInboxes?.filter(item => item.contacts[0].user_name.toLowerCase().includes(value.toLowerCase())) || [];
+        set({ dataSearch: search });
     },
     setNewMessagesInboxes: ({ inbox_id, lastMessage }) => {
         const { dataInboxes } = get();
@@ -33,7 +39,7 @@ export const useMessages = create((set, get) => ({
         const loadingData = get().isLoading;
 
         if (!loadingData) {
-            const inboxes_list = get().dataInboxes.map(inbox => inbox.inbox_id);
+            const inboxes_list = get().dataInboxes?.map(inbox => inbox.inbox_id) || [];
             const { data } = await fetchMessagesUnread(host_id, inboxes_list);
             set({ notificacionesMessages: data });
         };

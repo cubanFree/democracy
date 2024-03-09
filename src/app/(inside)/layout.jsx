@@ -21,7 +21,7 @@ export default async function layout({ children }) {
                 </ErrorDebounce>
             </div>
 
-            <div className="w-full min-h-16">
+            <div className="w-full min-h-14">
                 <FooterBar idHost={user?.id} />
             </div>
         </main>

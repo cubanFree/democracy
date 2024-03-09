@@ -1,7 +1,8 @@
 'use client';
 
+import React, { useEffect, useRef } from "react";
+
 import SearchBarInbox from "./search-bar";
-import React, { useEffect } from "react";
 import { cn } from "@/lib/utils";
 import ChatBox from "./chat-box";
 import ShowInboxes from "./show-inboxes";
@@ -20,13 +21,13 @@ export default function InboxCase({ idHost }) {
     const setNotificationsMessages = useMessages((state) => state.setNotificationsMessages)
 
     const supabase = createClientComponentClient();
-    const [handleSearch, setHandleSearch] = React.useState([]); // para obtener los inboxes de busqueda
+    const inputRef = useRef();
 
-    // obtener los inboxes
+    // OBTENER LOS INBOXES
     useEffect(() => {
         setDataInboxes()
         setNotificationsMessages(idHost)
-    }, [idHost, handleSearch, inboxOpen, isLoading, setHandleSearch, setDataInboxes, setNotificationsMessages]);
+    }, [idHost, inboxOpen, isLoading]);
 
     return (
         <div className={cn(
@@ -34,7 +35,7 @@ export default function InboxCase({ idHost }) {
                 inboxOpen ? 'md:grid-cols-2' : 'grid-cols-1'
             )}
         >
-            {/* lista de inboxs */}
+            {/* LISTA DE INBOXES */}
             <div 
                 className={cn(
                     "w-full h-full scroll-custom relative",
@@ -48,17 +49,17 @@ export default function InboxCase({ idHost }) {
                         </div>
                     ) : (
                         <>
-                            {/* search bar */}
-                            <SearchBarInbox onSearch={setHandleSearch} />
+                            {/* BARRA DE BUSQUEDA */}
+                            <SearchBarInbox inputRef={inputRef} />
 
-                            {/* inboxs list */}
-                            <ShowInboxes idHost={idHost} supabase={supabase} />
+                            {/* LISTA DE INBOXES MOSTRADA */}
+                            <ShowInboxes idHost={idHost} supabase={supabase} inputRef={inputRef} />
                         </>
                     )
                 }
             </div>
 
-            {/* messages */}
+            {/* MENSAJES DEL INBOX SELECCIONADO */}
             <div className={cn(
                     "w-full h-full overflow-hidden",
                     inboxOpen ? 'md:border-l-2 md:border-gray-500 z-0' : 'hidden'

@@ -15,21 +15,13 @@ import { fetchInboxesUnread } from '@/lib/data';
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useMessages } from '@/hooks/useGlobal';
 
-// actulizamos el Inboxes y la BD cuando Realtime capta un nuevo mensaje
+// ACTUALIZAMOS EL ESTADO DE LECTURA DE LOS INBOXES Y MENSAJES DEPENDIENDO SI EL INBOX ESTA ABIERTO O NO
 const updateDataInbox = async (message, idHost, isInboxOpen) => {
-
-    try {
-        // Actualizar los mensajes no leidos en la BD
-        const { error } = await handleMessageReceived(message, false, idHost, isInboxOpen);
-        if (error) throw new Error(error);
-
-    } catch (error) {
-        console.error('[ ERROR updateUnreadMessages ]', error);
-    }
+    await handleMessageReceived(message, false, idHost, isInboxOpen);
 }
 
 // obtener la cantidad de inbox sin leer
-const getCountInboxesUnread = async ({ user_id, setNotificationsInboxes }) => {
+const getCountInboxesUnread = async ({user_id, setNotificationsInboxes}) => {
     const { data: countInboxesUnread } = await fetchInboxesUnread({ user_id });
     setNotificationsInboxes(countInboxesUnread || 0);
 }
@@ -73,8 +65,8 @@ export default function FooterBar({ idHost }) {
 
                     if (payload.new.user_id !== idHost) {
                         updateDataInbox(payload.new, idHost, inboxOpen !== null ? true : false);
-                        getCountInboxesUnread({ user_id: idHost, setNotificationsInboxes });
-                        setNotificationsMessages(idHost)
+                        setNotificationsMessages(idHost);
+                        getCountInboxesUnread({user_id: idHost, setNotificationsInboxes});
                     }
                     
                 }
@@ -83,7 +75,7 @@ export default function FooterBar({ idHost }) {
                 { event: 'UPDATE', schema: 'public', table: 'inbox_members' },
                 (payload) => {
                     if (payload.new.user_id === idHost) {
-                        getCountInboxesUnread({ user_id: idHost, setNotificationsInboxes })
+                        getCountInboxesUnread({user_id: idHost, setNotificationsInboxes})
                     };
                 }
             )
@@ -106,31 +98,31 @@ export default function FooterBar({ idHost }) {
             name: 'home',
             path: '/home',
             icon: HiOutlineMap,
-            size: 30
+            size: 25
         },
         {
             name: 'warehouse',
             path: '/warehouse/summaries',
             icon: LuWarehouse,
-            size: 30
+            size: 25
         },
         {
             name: 'search',
             path: '/search',
             icon: FiSearch,
-            size: 30
+            size: 25
         },
         {
             name: 'messages',
             path: '/messages/inbox',
             icon: BiMessageSquareDetail,
-            size: 30
+            size: 25
         },
         {
             name: 'stock',
             path: '/stock',
             icon: TbArrowsExchange2,
-            size: 35
+            size: 30
         }
     ]
 
@@ -139,7 +131,7 @@ export default function FooterBar({ idHost }) {
             <ul className="flex h-full justify-center items-center gap-8 lg:mx-[10%]">
                 {
                     allLinks.map((link) => (
-                        <li key={link.name}>
+                        <li key={link.name} className="flex justify-center items-center">
                             <TooltipProvider>
                                 <Tooltip>
 
@@ -151,7 +143,7 @@ export default function FooterBar({ idHost }) {
                                                 (pathDefault === link.path ? ' text-gray-500 animate-pulse' : '')
                                             )}
                                             >
-                                                <link.icon size={link.size}/>
+                                                <link.icon size={link.size} />
                                                 {
                                                     (link.name === 'messages' && notificationsInboxes > 0) && 
                                                         <span 
