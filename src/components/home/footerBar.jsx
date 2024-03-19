@@ -64,7 +64,7 @@ export default function FooterBar({ idHost }) {
                     setNewMessagesInboxes({inbox_id: payload.new.inbox_id, lastMessage: payload.new});
 
                     if (payload.new.user_id !== idHost) {
-                        updateDataInbox(payload.new, idHost, inboxOpen !== null ? true : false);
+                        updateDataInbox(payload.new, idHost, ((inboxOpen !== null && inboxOpen.inbox_id === payload.new.inbox_id) ? true : false));
                         setNotificationsMessages(idHost);
                         getCountInboxesUnread({user_id: idHost, setNotificationsInboxes});
                     }

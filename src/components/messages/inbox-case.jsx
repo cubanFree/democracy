@@ -9,11 +9,12 @@ import ShowInboxes from "./show-inboxes";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { FiLoader } from "react-icons/fi";
 import { useMessages } from "@/hooks/useGlobal";
+import CreateGroup from "./createGroup";
 
 export default function InboxCase({ idHost }) {
 
     // GET
-    const isLoading = useMessages((state) => state.isLoading)
+    const isLoadingInboxes = useMessages((state) => state.isLoadingInboxes)
     const inboxOpen = useMessages((state) => state.inboxOpen)
 
     // SET
@@ -27,7 +28,7 @@ export default function InboxCase({ idHost }) {
     useEffect(() => {
         setDataInboxes()
         setNotificationsMessages(idHost)
-    }, [idHost, inboxOpen, isLoading]);
+    }, [idHost, inboxOpen, setDataInboxes, setNotificationsMessages]);
 
     return (
         <div className={cn(
@@ -43,14 +44,17 @@ export default function InboxCase({ idHost }) {
                 )}
             >
                 {
-                    isLoading ? (
+                    isLoadingInboxes ? (
                         <div className="w-full h-full flex flex-col justify-center items-center">
                             <FiLoader className="text-gray-500 animate-spin" size={30} />
                         </div>
                     ) : (
                         <>
                             {/* BARRA DE BUSQUEDA */}
-                            <SearchBarInbox inputRef={inputRef} />
+                            <div className="w-full flex justify-between sticky top-0 bg-sub-origin">
+                                <SearchBarInbox inputRef={inputRef} />
+                                <CreateGroup />
+                            </div>
 
                             {/* LISTA DE INBOXES MOSTRADA */}
                             <ShowInboxes idHost={idHost} supabase={supabase} inputRef={inputRef} />

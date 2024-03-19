@@ -12,3 +12,18 @@ export default function SkProfile() {
         </div>
     )
 }
+
+export function SkProfileInbox() {
+    return (
+        <div className="w-full flex items-start gap-4 p-2">
+            <Skeleton className="w-14 h-11 rounded-xl dark" />
+            <div className="w-full flex justify-between items-start gap-1">
+                <div className="w-full flex flex-col justify-between gap-2">
+                    <Skeleton className="w-16 h-2 rounded-xl dark" />
+                    <Skeleton className="w-12 h-2 rounded-xl dark" />
+                </div>
+                <Skeleton className="w-8 h-2 rounded-xl dark" />
+            </div>
+        </div>
+    )
+}

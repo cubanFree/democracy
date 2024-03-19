@@ -9,9 +9,10 @@ import { cn } from "@/lib/utils";
 import { updateMessagesToRead } from "@/lib/action";
 import { useMessages } from "@/hooks/useGlobal";
 import { IoCheckmarkDoneOutline, IoCheckmarkOutline } from "react-icons/io5";
+import { fetchProfileData } from "@/lib/data";
 
 // ACTUALIZA TODOS LOS MENSAJES DEL LOS CONTACTOS DEL INBOX COMO LEIDOS Y EL ESTADO DE INBOX ABIERTO
-const handleOpenInbox = async (item, date, idHost, setInboxOpen) => {
+const handleOpenInbox = async (item, date, idHost, setInboxOpen, setDataMessages) => {
     
     // Actualizar los mensajes no leidos en la BD como leidos para cada contacto que pertenece al inbox excepto al host
     try {
@@ -19,8 +20,10 @@ const handleOpenInbox = async (item, date, idHost, setInboxOpen) => {
     } catch (error) {
         console.error("Error updating messages to read:", error);
     }
-    
-    // Actualiza el estado para abrir el inbox
+
+    // Actualiza el estado para abrir el inbox con sus mensajes e INFO
+    const { data: isActive } = await fetchProfileData({ filter: { id: item.contacts[0].user_id }, table: 'users', caseBox: ['status'] });
+    setDataMessages({inbox_id: item.inbox_id});
     setInboxOpen(
         {
             inbox_id: item.inbox_id,
@@ -28,7 +31,8 @@ const handleOpenInbox = async (item, date, idHost, setInboxOpen) => {
             chat_name: item.title_inbox || item.contacts[0].user_name,
             is_group: item.is_group,
             contacts: item.contacts,
-            lastMessage_time: date
+            lastMessage_time: date,
+            status: isActive.status
         }
     );
 };
@@ -92,10 +96,12 @@ export default function ShowInboxes({ idHost, supabase, inputRef }) {
     const dataInboxes = useMessages((state) => state.dataInboxes)
     const dataSearch = useMessages((state) => state.dataSearch)
     const notificacionesMessages = useMessages((state) => state.notificacionesMessages)
+    const inboxOpen = useMessages((state) => state.inboxOpen)
 
     // SET
     const setInboxOpen = useMessages((state) => state.setInboxOpen);
     const setDataInboxes = useMessages((state) => state.setDataInboxes);
+    const setDataMessages = useMessages((state) => state.setDataMessages);
 
     // ESCUCHANDO REALTIME SI EL MENSAJE ENVIADO POR EL HOST HA SIDO LEIDO O NO, PARA CAMBIAR EL ESTADO DEL INBOX
     useEffect(() => {
@@ -141,14 +147,16 @@ export default function ShowInboxes({ idHost, supabase, inputRef }) {
             <React.Fragment>
                 {(dataSearch?.length ? dataSearch : dataInboxes).map((item) => {
                     const date = moment(item.lastMessage?.created_at).format('hh:mm A');
+                    const completeDate = moment(item.lastMessage?.created_at).format('MM/DD/YY, hh:mm A');
                     return (
                         <InboxItem
                             key={item.inbox_id}
+                            disabled={inboxOpen && inboxOpen.inbox_id === item.inbox_id}
                             idHost={idHost}
                             date={date}
                             item={item}
                             notificacionesMessages={notificacionesMessages}
-                            onClick={() => handleOpenInbox(item, date, idHost, setInboxOpen)}
+                            onClick={() => inboxOpen && inboxOpen.inbox_id === item.inbox_id ? {} : handleOpenInbox(item, completeDate, idHost, setInboxOpen, setDataMessages)}
                         />
                     )
                 })}

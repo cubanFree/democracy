@@ -28,26 +28,26 @@ export default function SearchBarInbox({ inputRef }) {
     };
 
     return (
-        <main className="w-full flex flex-col gap-2 sticky top-0 bg-sub-origin px-2 py-1">
+        <main className="w-full flex flex-col gap-2 p-2">
             <div className="w-full flex justify-start items-center gap-2">
-                <label className="w-full flex gap-4 justify-start items-center border border-gray-700 px-2 rounded-md bg-origin">
+                <label className="w-full flex gap-4 justify-start items-center px-2 rounded-md bg-zinc-800">
                     <FiSearch />
                     <Input 
                         type="text"
                         ref={inputRef}
                         placeholder="search inbox..."
                         onChange={(e) => handleSearch(e.target.value)}
-                        className="w-full border-0 p-0 py-2 h-auto bg-origin"
+                        className="w-full border-0 p-0 py-2 h-auto bg-transparent"
                     />
+                    {searchValue && (
+                        <span 
+                            className="text-blue-400 flex items-center justify-center cursor-pointer"
+                            onClick={cancelSearch}
+                        >
+                            cancel
+                        </span>
+                    )}
                 </label>
-                {searchValue && (
-                    <span 
-                        className="text-blue-400 flex items-center justify-center cursor-pointer"
-                        onClick={cancelSearch}
-                    >
-                        cancel
-                    </span>
-                )}
             </div>
         </main>
     );

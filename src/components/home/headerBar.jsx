@@ -52,7 +52,7 @@ export default function HeaderBar() {
                         ))
                     }
                     <li className="p-2">
-                        <Suspense fallback={<Skeleton className="h-12 w-12 rounded-lg py-2 px-4" />}>
+                        <Suspense fallback={<Skeleton className="h-8 w-8 rounded-lg py-2 px-4 dark" />}>
                             <ProfileDesign />
                         </Suspense>
                     </li>
