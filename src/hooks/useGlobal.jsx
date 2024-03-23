@@ -14,7 +14,7 @@ export const useMessages = create((set, get) => ({
     dataMessages: [],
     setDataInboxes: async () => {
         const { data } = await fetchInbox();
-        set({ dataInboxes: data });
+        set({ dataInboxes: data.sort((a, b) => new Date(b.lastMessage?.created_at).getTime() - new Date(a.lastMessage?.created_at).getTime()) });
         set((state) => ({ ...state, isLoadingInboxes: false }));
     },
     setDataSearch: (value) => {
@@ -85,16 +85,18 @@ export const useCreateGroup = create((set, get) => ({
     setAddMember: (value) => {
         const { members } = get();
 
-        if (!members.includes(value) && members.length < 3) {
+        const check = members.some(member => member.id === value.id);
+        if (members.length < 3 && !check) {
             set({ members: [...members, value] });
         }
-        set({ createGroup: value })
     },
     setRemoveMember: (value) => {
         const { members } = get();
-        
-        if (members.length > 1 && members.includes(value)) {
-            set({ members: members.filter(member => member !== value) });
+
+        const check = members.some(member => member.id === value);
+        if (members.length >= 1 && check) {
+            set({ members: members.filter(member => member.id !== value) });
         }
     },
+    setEmptyMembers: () => set({ members: [] }),
 }))

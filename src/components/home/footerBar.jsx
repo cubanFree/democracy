@@ -147,7 +147,7 @@ export default function FooterBar({ idHost }) {
                                                 {
                                                     (link.name === 'messages' && notificationsInboxes > 0) && 
                                                         <span 
-                                                            className='bg-blue-600 rounded-full px-2 text-[12px] font-bold absolute -top-1 -right-1'
+                                                            className='bg-blue-600 rounded-full px-2 text-[12px] font-bold absolute -top-1'
                                                             >
                                                                 {notificationsInboxes}
                                                         </span>

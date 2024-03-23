@@ -33,7 +33,7 @@ export default async function ProfileDesign() {
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Image 
-                    src={data?.avatar_url || '/avatar_default.jpg'} 
+                    src={data[0]?.avatar_url || '/avatar_default.jpg'} 
                     alt="avatar_profile" 
                     width={40} 
                     height={40} 

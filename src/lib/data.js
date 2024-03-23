@@ -25,31 +25,30 @@ export async function checkUsernameExists(username) {
 }
 
 // obtener la/s columna/s de cualquier tabla;
-export async function fetchProfileData({ filter, table, caseBox = [] }) {
+export async function fetchProfileData({ filter, table, caseBox = [], limit = 1 }) {
     const supabase = createServerActionClient({ cookies });
+    const { data: { user } } = await supabase.auth.getUser();
     
     try {
-        if (!filter) throw new Error('ID is required');
+        if (!Object.keys(filter).length) throw new Error('ID is required');
 
-        let resultRequest;
-        if (caseBox.length) {
-            // Crear un array de promesas, cada una resolviendo a un objeto {column: data}
-            resultRequest = await Promise.all(caseBox.map(async column => {
-                const { data, error } = await supabase.from(table).select(column).match(filter);
-                if (error) throw new Error('ERROR 500: Something went wrong in fetchProfileData');
-                return { [column]: data[0][column] };
-            }));
+        // Construir la consulta
+        const query = caseBox.length > 0 ? caseBox.join(",") : "*";
+        let queryBuilder = supabase.from(table).select(query).limit(limit);
+
+        // Aplicar filtro;
+        if (filter?.user_name) {
+            queryBuilder = queryBuilder.ilike('user_name', `%${filter.user_name}%`).filter('id', 'not.eq', user?.id);
         } else {
-            // Si no se especifican columnas, obtener todas las columnas para el ID dado
-            const { data, error } = await supabase.from(table).select().match(filter);
-            if (error) throw new Error('ERROR 500: Something went wrong in fetchProfileData');
-            resultRequest = [{ allData: data[0] }];
+            queryBuilder = queryBuilder.match(filter);
         }
 
-        // Combina todos los objetos en uno solo, resultando en un objeto de objetos
-        const combinedData = resultRequest.reduce((acc, curr) => ({ ...acc, ...curr }), {});
+        // Ejecutar consulta
+        const { data, error } = await queryBuilder;
+        if (error) throw new Error('ERROR 500: Something went wrong in fetchProfileData');
 
-        return { data: combinedData, error: null };
+        return { data, error: null };
+        
         
     } catch (error) {
         console.error('[ ERROR fetchProfileData ]', error.message);

@@ -1,7 +1,8 @@
 'use client';
 
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
+import { useDebouncedCallback } from 'use-debounce';
 
 import { MdOutlineClear } from "react-icons/md";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
@@ -10,6 +11,19 @@ import { Button } from "../ui/button";
 import BtnSendForm from "./btnSendForm";
 import { useCreateGroup } from "@/hooks/useGlobal";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Input } from "../ui/input";
+import { fetchProfileData } from "@/lib/data";
+import { MdOutlineDelete } from "react-icons/md";
+
+// ESTADO DE VISIBILIDAD DEL AVATAR
+const handlingFileChange = (event, avatar, setAvatar) => {
+    const file = event.target.files[0]
+    // revocar la url cuando avatar => true y el evento contenga un objeto file
+    if (avatar && file) URL.revokeObjectURL(avatar)
+    // crea la nueva url y actualiza el estado si el objeto file existe
+    if (file) setAvatar( URL.createObjectURL(file) )
+}
 
 export default function CreateGroup() {
 
@@ -17,26 +31,38 @@ export default function CreateGroup() {
     const members = useCreateGroup(state => state.members)
 
     // SET
+    const setAddMember = useCreateGroup(state => state.setAddMember)
+    const setRemoveMember = useCreateGroup(state => state.setRemoveMember)
+    const setEmptyMembers = useCreateGroup(state => state.setEmptyMembers)
 
+    // OTROS ESTADOS
     const [avatar, setAvatar] = React.useState('/avatar_default.jpg')
-    
-    // ESTADO DE VISIBILIDAD DEL AVATAR
-    const handlingFileChange = (event) => {
-        const file = event.target.files[0]
+    const [membersFound, setMembersFound] = React.useState([])
+    const [openFrame, setOpenFrame] = React.useState(false)
+    const [openSearch, setOpenSearch] = React.useState(false)
 
-        // revocar la url cuando avatar => true y el evento contenga un objeto file
-        if (avatar && file) URL.revokeObjectURL(avatar)
-        
-        // crea la nueva url y actualiza el estado si el objeto file existe
-        if (file) setAvatar( URL.createObjectURL(file) )
-    }
+    // ESCUCHANDO BUSQUEDA DE MIEMBROS
+    const searchMember = useDebouncedCallback(async (search) => {
+        const { data, error } = await fetchProfileData({ filter: { user_name: search }, table: 'users', caseBox: ['id', 'user_name', 'avatar_url'], limit: 3 })
+        setMembersFound(data)
+    }, 500)
+
+    useEffect(() => {
+        if (!openFrame) {
+            setAvatar('/avatar_default.jpg')
+            setEmptyMembers()
+            setMembersFound([])
+        }
+        !openSearch && setMembersFound([])
+
+    }, [openFrame, openSearch, setEmptyMembers, setMembersFound, setAvatar])
 
     return (
         <main className="flex justify-center items-center p-2 pl-0">
             <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger>
-                        <Drawer>
+                        <Drawer open={openFrame} onOpenChange={setOpenFrame}>
                             <DrawerTrigger asChild>
                                 <MdOutlineClear size={20} className="rotate-45 text-blue-400 " />
                             </DrawerTrigger>
@@ -45,75 +71,129 @@ export default function CreateGroup() {
                                 <form 
                                     action=""
                                     className="mx-auto w-full max-w-sm"
-                                    >
-                                        <DrawerHeader>
-                                            <DrawerTitle>Create a new group</DrawerTitle>
-                                            <DrawerDescription>You can only add a max 3 members to the group.</DrawerDescription>
-                                        </DrawerHeader>
+                                >
+                                    <DrawerHeader>
+                                        <DrawerTitle>Create a new group</DrawerTitle>
+                                        <DrawerDescription>You can only add a max 3 members to the group.</DrawerDescription>
+                                    </DrawerHeader>
 
-                                        <div className="p-4 flex gap-8">
-                                            <label className="flex flex-col justify-center gap-2 items-center cursor-pointer">
-                                                <Image 
-                                                    src={avatar}
-                                                    alt="Avatar Group"
-                                                    width={100}
-                                                    height={100}
-                                                    className="rounded-xl object-cover w-20 h-20"
-                                                />
-                                                <input
-                                                    disabled={false}
-                                                    name="avatar"
-                                                    type="file"
-                                                    onChange={handlingFileChange}
-                                                    accept="image/*"
-                                                    className="hidden"
-                                                />
-                                                <span className="text-sm text-gray-500">Choose an image</span>
-                                            </label>
+                                    <div className="p-4 w-full grid grid-cols-[auto_1fr] gap-8">
+                                        <label className="flex flex-col justify-center gap-2 items-center cursor-pointer">
+                                            <Image 
+                                                src={avatar}
+                                                alt="Avatar Group"
+                                                width={100}
+                                                height={100}
+                                                className="rounded-xl object-cover w-20 h-20"
+                                            />
+                                            <input
+                                                disabled={false}
+                                                name="avatar"
+                                                type="file"
+                                                onChange={(event) => handlingFileChange(event, avatar, setAvatar)}
+                                                accept="image/*"
+                                                className="hidden"
+                                            />
+                                            <span className="text-sm text-gray-500">Group Image</span>
+                                        </label>
 
-                                            <div className="grid grid-cols-3 gap-2">
+                                        <div className="w-full grid grid-rows-2 items-center">
+                                            <Input
+                                                name="group_name"
+                                                type="text"
+                                                placeholder="Group Name"
+                                                className="w-full"
+                                                autoComplete="off"
+                                            />
+                                            <div className="w-full grid grid-cols-[auto_auto_auto] gap-4 items-center justify-start">
                                                 {
                                                     members?.length ? (
                                                         members?.map((member) => (
                                                             <article 
                                                                 key={member.id}
+                                                                className="cursor-pointer w-full flex justify-center items-center relative"
+                                                                onClick={() => setRemoveMember(member.id)}
                                                             >
-                                                                <Image
-                                                                    src={member.avatar}
-                                                                    alt="Avatar Member"
-                                                                    width={100}
-                                                                    height={100}
-                                                                    className="rounded-xl object-cover w-10 h-10"
-                                                                />
+                                                                <div className="relative group w-10 h-10">
+                                                                    <Image
+                                                                        src={member.avatar_url}
+                                                                        alt="Avatar Member"
+                                                                        width={100}
+                                                                        height={100}
+                                                                        className="rounded-xl object-cover w-full h-full group-hover:opacity-50"
+                                                                    />
+                                                                    <MdOutlineDelete 
+                                                                        size={25} 
+                                                                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 hidden group-hover:flex"
+                                                                    />
+                                                                </div>
                                                             </article>
                                                         ))
                                                     ) : null
                                                 }
-                                                <article 
-                                                    className={cn(
-                                                        members?.length < 3 ? "visible" : "hidden"
-                                                    )}
-                                                >
-                                                    <span
-                                                        className="rounded-xl border border-sky-600 text-sm font-bold text-sky-600 w-10 h-10 flex items-center justify-center cursor-pointer hover:border-sky-500 hover:text-sky-500"
-                                                    >
-                                                        + {members?.length + 1}
-                                                    </span>
-                                                </article>
+                                                
+                                                <Popover open={openSearch} onOpenChange={setOpenSearch}>
+                                                    <PopoverTrigger asChild>
+                                                        <article 
+                                                            className={cn(
+                                                                members?.length < 3 ? "visible w-full flex items-center justify-center" : "hidden"
+                                                            )}
+                                                        >
+                                                            <span
+                                                                className="rounded-xl border border-sky-600 text-md font-bold text-sky-600 w-10 h-10 flex items-center justify-center cursor-pointer hover:border-sky-500 hover:text-sky-500"
+                                                            >
+                                                                + {members?.length + 1}
+                                                            </span>
+                                                        </article>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="bg-zinc-800 p-0 border-0 text-gray-300 flex flex-col">
+                                                        <Input 
+                                                            type="text"
+                                                            placeholder="search member..."
+                                                            onChange={(e) => searchMember(e.target.value)}
+                                                            className="w-full border-0 p-2 h-auto bg-transparent"
+                                                            autoComplete="off"
+                                                        />
+                                                        {
+                                                            membersFound?.length ? (
+                                                                membersFound?.map((member) => (
+                                                                    <article
+                                                                        key={member.id}
+                                                                        className="w-full flex justify-start items-center gap-4 p-2 hover:bg-zinc-700 cursor-pointer border-t border-zinc-600"
+                                                                        onClick={() => {
+                                                                            setAddMember({ id: member.id, avatar_url: member.avatar_url })
+                                                                            setOpenSearch(false)
+                                                                        }}
+                                                                    >
+                                                                        <Image
+                                                                            src={member.avatar_url}
+                                                                            alt="Avatar Found"
+                                                                            width={100}
+                                                                            height={100}
+                                                                            className="rounded-xl object-cover w-10 h-10"
+                                                                        />
+                                                                        <span>{member.user_name}</span>
+                                                                    </article>
+                                                                ))
+                                                            ) : null
+                                                        }
+                                                    </PopoverContent>
+                                                </Popover>
                                             </div>
                                         </div>
+                                    </div>
 
-                                        <DrawerFooter>
-                                            <BtnSendForm text="Create" className={"w-full dark"} />
-                                            <DrawerClose asChild>
-                                                <Button 
-                                                    variant="outline"
-                                                    className="w-full bg-transparent dark"
-                                                    >
-                                                        Cancel
-                                                </Button>
-                                            </DrawerClose>
-                                        </DrawerFooter>
+                                    <DrawerFooter>
+                                        <BtnSendForm text="Create" className={"w-full dark"} />
+                                        <DrawerClose asChild>
+                                            <Button 
+                                                variant="outline"
+                                                className="w-full bg-transparent dark"
+                                                >
+                                                    Cancel
+                                            </Button>
+                                        </DrawerClose>
+                                    </DrawerFooter>
                                 </form>
                             </DrawerContent>
 

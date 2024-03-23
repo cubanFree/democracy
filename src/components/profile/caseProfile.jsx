@@ -37,10 +37,10 @@ export default async function CaseProfile({ idTarget }) {
     if (errorUser) throw new Error('(Try refresh, else): It is recommended that you Log out, and then Log in. If it doesn`t work, please contact us or send a report.');
 
     // fetching citizenship y residenceship(si existe)
-    const req1 = fetchProfileData({ filter: {id: dataUser?.citizenship}, table: 'countries', caseBox: ['name'] });
+    const req1 = fetchProfileData({ filter: {id: dataUser[0]?.citizenship}, table: 'countries', caseBox: ['name'] });
     let citizenship, residenceship;
-    if (dataUser?.residenceship) {
-        const req2 = fetchProfileData({ filter: {id: dataUser?.residenceship}, table: 'countries', caseBox: ['name'] });
+    if (dataUser[0]?.residenceship) {
+        const req2 = fetchProfileData({ filter: {id: dataUser[0]?.residenceship}, table: 'countries', caseBox: ['name'] });
         [citizenship, residenceship] = await Promise.allSettled([req1, req2]);
     } else {
         citizenship = await req1;
@@ -51,26 +51,26 @@ export default async function CaseProfile({ idTarget }) {
     if (errorAbout) throw new Error('(Try refresh, else): It is recommended that you Log out, and then Log in. If it doesn`t work, please contact us or send a report.');
 
     // convertir fecha de creacion
-    const dataPerfil = moment(dataUser?.created_at).fromNow();
+    const dataPerfil = moment(dataUser[0]?.created_at).fromNow();
 
     // lista de los rankings
     const listsRanking = [
-        { name: 'Ranking local', value: dataAbout?.ranking_local, icon: MdOutlineLocationOn, size: 20},
-        { name: 'Ranking global', value: dataAbout?.ranking_global, icon: IoEarth, size: 20},
+        { name: 'Ranking local', value: dataAbout[0]?.ranking_local, icon: MdOutlineLocationOn, size: 20},
+        { name: 'Ranking global', value: dataAbout[0]?.ranking_global, icon: IoEarth, size: 20},
     ]
 
     return (
         <main className="w-full gap-4">
             <div className="w-full flex gap-4 lg:gap-2 lg:flex-col">
-                <AvatarConf avatar_url={dataUser?.avatar_url} status={dataUser?.status}/>
+                <AvatarConf avatar_url={dataUser[0]?.avatar_url} status={dataUser[0]?.status}/>
                 
                 <div className="flex flex-col items-start gap-2 lg:items-center">
 
                     {/* nombre y roles */}
                     <span className="flex gap-2 justify-center items-center text-xl font-bold text-center lg:text-2xl">
-                        {dataUser?.user_name || 'Unknown'}
+                        {dataUser[0]?.user_name || 'Unknown'}
                         {
-                            dataUser?.roles.includes('beginner')
+                            dataUser[0]?.roles.includes('beginner')
                                 ? <FaBuildingWheat size={15} color="green"/> 
                                 : null
                         }
@@ -119,7 +119,7 @@ export default async function CaseProfile({ idTarget }) {
 
                         {
                             idTarget && (
-                                <DesignSendMessage idHost={user?.id} idTarget={idTarget} user_name={dataUser?.user_name} />
+                                <DesignSendMessage idHost={user?.id} idTarget={idTarget} user_name={dataUser[0]?.user_name} />
                             )
                         }
                         
@@ -130,11 +130,11 @@ export default async function CaseProfile({ idTarget }) {
 
                     {/* description */}
                     {
-                        dataUser?.description && (
+                        dataUser[0]?.description && (
                             <span 
                                 className='w-full text-gray-500 lg:text-center'
                                 >
-                                    {dataUser?.description}
+                                    {dataUser[0]?.description}
                             </span>
                         )
                     }
@@ -144,7 +144,7 @@ export default async function CaseProfile({ idTarget }) {
                     {/* Information about
                     <div className="w-full flex flex-col gap-2 items-start text-sm">
                         <span><strong>Residenceship:</strong> <span className="fond-light text-gray-400">{residenceship?.data?.name || 'N/A'}</span></span>
-                        <span><strong>Rating:</strong> <span className="fond-light text-gray-400">{dataAbout?.rating || 'N/A'}</span></span>
+                        <span><strong>Rating:</strong> <span className="fond-light text-gray-400">{dataAbout[0]?.rating || 'N/A'}</span></span>
                     </div> */}
 
                 </div>
