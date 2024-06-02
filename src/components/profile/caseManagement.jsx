@@ -27,22 +27,22 @@ export default async function CaseInfoManagement({ idTarget }) {
     const invoices = [
         {
           table: "Directors",
-          value: dataCompany?.directors,
+          value: dataCompany[0]?.directors,
         },
         {
             table: "Employees",
             value: [
                 {
                     name: "Workers",
-                    data: dataCompany?.employees_workers
+                    data: dataCompany[0]?.employees_workers
                 },
                 {
                     name: "Administration",
-                    data: dataCompany?.employees_administration
+                    data: dataCompany[0]?.employees_administration
                 },
                 {
                     name: "Admin_expenses",
-                    data: dataCompany?.administrative_expenses,
+                    data: dataCompany[0]?.administrative_expenses,
                     adjective: '%'
                 },
             ],
@@ -52,12 +52,12 @@ export default async function CaseInfoManagement({ idTarget }) {
             value: [
                 {
                     name: "Production_speed",
-                    data: dataCompany?.bonus_production_speed,
+                    data: dataCompany[0]?.bonus_production_speed,
                     adjective: '%'
                 },
                 {
                     name: "Sales_speed",
-                    data: dataCompany?.bonus_sales_speed,
+                    data: dataCompany[0]?.bonus_sales_speed,
                     adjective: '%'
                 },
             ],
@@ -67,17 +67,17 @@ export default async function CaseInfoManagement({ idTarget }) {
             value: [
                 {
                     name: "Company",
-                    data: dataCompany?.company_valuation,
+                    data: dataCompany[0]?.company_valuation,
                     adjective: '$'
                 },
                 {
                     name: "Infrastructure",
-                    data: dataCompany?.infrastructure_valuation,
+                    data: dataCompany[0]?.infrastructure_valuation,
                     adjective: '$'
                 },
                 {
                     name: "Patents",
-                    data: dataCompany?.patents_valuation,
+                    data: dataCompany[0]?.patents_valuation,
                     adjective: '$'
                 },
             ],
@@ -87,12 +87,12 @@ export default async function CaseInfoManagement({ idTarget }) {
             value: [
                 {
                     name: "Bonds_sold",
-                    data: dataCompany?.liabilities_bonds_sold,
+                    data: dataCompany[0]?.liabilities_bonds_sold,
                     adjective: '$'
                 },
                 {
                     name: "Interest_payment",
-                    data: dataCompany?.liabilities_interest_payment,
+                    data: dataCompany[0]?.liabilities_interest_payment,
                     adjective: '$/day'
                 },
             ],

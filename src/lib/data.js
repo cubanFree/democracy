@@ -94,10 +94,10 @@ export async function fetchInbox() {
 
                 if (contactsError) throw new Error(`Error fetching inboxes: ${contactsError.message || 'Unknown error'}`);
 
-                contactsInfo = contacts.map(({ user }) => ({
-                    user_id: user.id,
-                    user_name: user.user_name,
-                    avatar_url: user.avatar_url,
+                contactsInfo = contacts.map(({ users }) => ({
+                    user_id: users.id,
+                    user_name: users.user_name,
+                    avatar_url: users.avatar_url,
                 }));
 
             } else {

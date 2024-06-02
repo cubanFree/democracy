@@ -85,7 +85,7 @@ export default async function CaseProfile({ idTarget }) {
                     {/* citizenship */}
                     <span className="flex justify-center items-center gap-2 text-gray-400">
                         <HiOutlineIdentification size={20} />
-                        {citizenship?.data?.name || 'N/A'}
+                        {citizenship?.data[0]?.name || 'N/A'}
                     </span>
 
                     {/* lista de los rankings */}

@@ -53,7 +53,7 @@ export default function InboxCase({ idHost }) {
                             {/* BARRA DE BUSQUEDA */}
                             <div className="w-full flex justify-between sticky top-0 bg-sub-origin">
                                 <SearchBarInbox inputRef={inputRef} />
-                                <CreateGroup />
+                                <CreateGroup idHost={idHost} />
                             </div>
 
                             {/* LISTA DE INBOXES MOSTRADA */}

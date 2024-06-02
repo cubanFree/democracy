@@ -2,6 +2,7 @@
 
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
+import { parser } from 'datauri';
 
 export async function loginWithPassword(formData) {
     try {
@@ -149,7 +150,7 @@ export async function create_message(inbox_id, content_text, contacts_id) { // c
     }
 }
 
-export async function create_inbox({user_id1, user_id2, content_text, avatar_group = null, is_group = false}) {
+export async function create_inbox({user_id1, user_id2, user_id3, user_id4, content_text, avatar_group, is_group = false, title_inbox = null}) {
 
     const supabase = createServerActionClient({ cookies });
 
@@ -179,8 +180,11 @@ export async function create_inbox({user_id1, user_id2, content_text, avatar_gro
 
         // Crear una nueva conversacion en caso de que inboxExists no devuelve un id, que is_group sea false, y despues agregar el mensaje a la conversacion
         if (is_group === true) {
+            const parsedData = parse(avatar_group);
+            console.log(user_id1, user_id2, user_id3, user_id4, parsedData, is_group, title_inbox)
+            return { error: null }
             const { data: inboxCreate, error: errorCreateInbox } = await supabase
-                .rpc('create_inbox', { user_id1, user_id2, is_group: true });
+                .rpc('create_inbox', { user_id1, user_id2, user_id3, user_id4, is_group: true, title_inbox });
             
             console.log('inboxCreateGroup ->>> ', inboxCreate, errorCreateInbox)
             if (errorCreateInbox) throw new Error(errorCreateInbox);

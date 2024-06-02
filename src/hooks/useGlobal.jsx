@@ -14,7 +14,7 @@ export const useMessages = create((set, get) => ({
     dataMessages: [],
     setDataInboxes: async () => {
         const { data } = await fetchInbox();
-        set({ dataInboxes: data.sort((a, b) => new Date(b.lastMessage?.created_at).getTime() - new Date(a.lastMessage?.created_at).getTime()) });
+        set({ dataInboxes: data?.sort((a, b) => new Date(b.lastMessage?.created_at).getTime() - new Date(a.lastMessage?.created_at).getTime()) });
         set((state) => ({ ...state, isLoadingInboxes: false }));
     },
     setDataSearch: (value) => {

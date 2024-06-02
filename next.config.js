@@ -16,6 +16,11 @@ const nextConfig = {
             }
         ],
     },
+    experimental: {
+        serverActions: {
+          bodySizeLimit: '10mb' // Puedes ajustar el límite a tus necesidades, por ejemplo 10mb
+        }
+    }
 }
 
 module.exports = nextConfig

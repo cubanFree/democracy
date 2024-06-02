@@ -15,17 +15,22 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Input } from "../ui/input";
 import { fetchProfileData } from "@/lib/data";
 import { MdOutlineDelete } from "react-icons/md";
+import { create_inbox } from "@/lib/action";
 
 // ESTADO DE VISIBILIDAD DEL AVATAR
-const handlingFileChange = (event, avatar, setAvatar) => {
-    const file = event.target.files[0]
-    // revocar la url cuando avatar => true y el evento contenga un objeto file
-    if (avatar && file) URL.revokeObjectURL(avatar)
-    // crea la nueva url y actualiza el estado si el objeto file existe
-    if (file) setAvatar( URL.createObjectURL(file) )
-}
+const handlingFileChange = (event, setAvatar, setFileBase64) => {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setAvatar(URL.createObjectURL(file));
+            setFileBase64(reader.result);
+        };
+        reader.readAsDataURL(file);
+    }
+};
 
-export default function CreateGroup() {
+export default function CreateGroup({ idHost }) {
 
     // GET
     const members = useCreateGroup(state => state.members)
@@ -36,10 +41,12 @@ export default function CreateGroup() {
     const setEmptyMembers = useCreateGroup(state => state.setEmptyMembers)
 
     // OTROS ESTADOS
-    const [avatar, setAvatar] = React.useState('/avatar_default.jpg')
+    const [avatar, setAvatar] = React.useState(null)
     const [membersFound, setMembersFound] = React.useState([])
+    const [fileBase64, setFileBase64] = React.useState(null);
     const [openFrame, setOpenFrame] = React.useState(false)
     const [openSearch, setOpenSearch] = React.useState(false)
+    const inputNameRef = React.useRef(null)
 
     // ESCUCHANDO BUSQUEDA DE MIEMBROS
     const searchMember = useDebouncedCallback(async (search) => {
@@ -49,13 +56,39 @@ export default function CreateGroup() {
 
     useEffect(() => {
         if (!openFrame) {
-            setAvatar('/avatar_default.jpg')
+            setAvatar(null)
             setEmptyMembers()
             setMembersFound([])
+            setFileBase64(null);
         }
         !openSearch && setMembersFound([])
 
-    }, [openFrame, openSearch, setEmptyMembers, setMembersFound, setAvatar])
+    }, [openFrame, openSearch, setEmptyMembers, setMembersFound, setAvatar, setFileBase64])
+
+    const handleSubmit = async (formData) => {
+        if (!idHost) return;
+
+        const groupName = formData.get('group_name');
+
+        const { error } = await create_inbox({
+            user_id1: idHost,
+            user_id2: members[0]?.id || null,
+            user_id3: members[1]?.id || null,
+            user_id4: members[2]?.id || null,
+            is_group: true,
+            avatar_group: fileBase64,
+            title_inbox: groupName
+        });
+
+        return;
+        if (!error) {
+            inputNameRef.current.value = '';
+            setEmptyMembers();
+            setAvatar(null);
+            setOpenFrame(false);
+            setFileBase64(null);
+        }
+    }
 
     return (
         <main className="flex justify-center items-center p-2 pl-0">
@@ -69,7 +102,7 @@ export default function CreateGroup() {
 
                             <DrawerContent className="bg-origin border border-stone-800">
                                 <form 
-                                    action=""
+                                    action={handleSubmit}
                                     className="mx-auto w-full max-w-sm"
                                 >
                                     <DrawerHeader>
@@ -80,7 +113,7 @@ export default function CreateGroup() {
                                     <div className="p-4 w-full grid grid-cols-[auto_1fr] gap-8">
                                         <label className="flex flex-col justify-center gap-2 items-center cursor-pointer">
                                             <Image 
-                                                src={avatar}
+                                                src={avatar || '/avatar_default.jpg'}
                                                 alt="Avatar Group"
                                                 width={100}
                                                 height={100}
@@ -88,9 +121,9 @@ export default function CreateGroup() {
                                             />
                                             <input
                                                 disabled={false}
-                                                name="avatar"
+                                                name="group_avatar"
                                                 type="file"
-                                                onChange={(event) => handlingFileChange(event, avatar, setAvatar)}
+                                                onChange={(event) => handlingFileChange(event, setAvatar, setFileBase64)}
                                                 accept="image/*"
                                                 className="hidden"
                                             />
@@ -100,6 +133,7 @@ export default function CreateGroup() {
                                         <div className="w-full grid grid-rows-2 items-center">
                                             <Input
                                                 name="group_name"
+                                                ref={inputNameRef}
                                                 type="text"
                                                 placeholder="Group Name"
                                                 className="w-full"

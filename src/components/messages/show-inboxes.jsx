@@ -32,7 +32,7 @@ const handleOpenInbox = async (item, date, idHost, setInboxOpen, setDataMessages
             is_group: item.is_group,
             contacts: item.contacts,
             lastMessage_time: date,
-            status: isActive.status
+            status: isActive[0].status
         }
     );
 };
@@ -52,7 +52,7 @@ const InboxItem = memo(({ item, idHost, date, notificacionesMessages, onClick })
         >
             <div className="w-full flex gap-4 items-center justify-start">
                 <Image 
-                    src={item.is_group ? item.avatar_group : item.contacts[0].avatar_url || '/avatar_default.jpg'}
+                    src={item.is_group ? item.avatar_group || '/avatar_default.jpg' : item.contacts[0].avatar_url || '/avatar_default.jpg'}
                     alt="avatar inbox"
                     width={44}
                     height={44}
@@ -146,8 +146,8 @@ export default function ShowInboxes({ idHost, supabase, inputRef }) {
         return (
             <React.Fragment>
                 {(dataSearch?.length ? dataSearch : dataInboxes).map((item) => {
-                    const date = moment(item.lastMessage?.created_at).format('hh:mm A');
-                    const completeDate = moment(item.lastMessage?.created_at).format('MM/DD/YY, hh:mm A');
+                    const date = moment(item.lastMessage?.created_at).format('hh:mm A') || 'No date';
+                    const completeDate = moment(item.lastMessage?.created_at).format('MM/DD/YY, hh:mm A') || 'No date';
                     return (
                         <InboxItem
                             key={item.inbox_id}
