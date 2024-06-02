@@ -54,10 +54,10 @@ const InboxItem = memo(({ item, idHost, date, notificacionesMessages, onClick })
                 <Image 
                     src={item.is_group ? item.avatar_group || '/avatar_default.jpg' : item.contacts[0].avatar_url || '/avatar_default.jpg'}
                     alt="avatar inbox"
-                    width={44}
-                    height={44}
+                    width={500}
+                    height={500}
                     priority
-                    className='object-cover rounded-xl'
+                    className='object-cover rounded-xl w-11 h-11'
                 />
                 <div className="w-full flex flex-col justify-between gap-1 truncate">
                     <div className="w-full flex justify-between">

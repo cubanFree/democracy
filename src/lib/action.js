@@ -2,7 +2,6 @@
 
 import { createServerActionClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { parser } from 'datauri';
 
 export async function loginWithPassword(formData) {
     try {
@@ -150,7 +149,7 @@ export async function create_message(inbox_id, content_text, contacts_id) { // c
     }
 }
 
-export async function create_inbox({user_id1, user_id2, user_id3, user_id4, content_text, avatar_group, is_group = false, title_inbox = null}) {
+export async function create_inbox({user_id1, user_id2, user_id3, user_id4, content_text, avatar_group: { file, type }, is_group = false, title_inbox = null}) {
 
     const supabase = createServerActionClient({ cookies });
 
@@ -180,28 +179,50 @@ export async function create_inbox({user_id1, user_id2, user_id3, user_id4, cont
 
         // Crear una nueva conversacion en caso de que inboxExists no devuelve un id, que is_group sea false, y despues agregar el mensaje a la conversacion
         if (is_group === true) {
-            const parsedData = parse(avatar_group);
-            console.log(user_id1, user_id2, user_id3, user_id4, parsedData, is_group, title_inbox)
-            return { error: null }
+
+            // Crear el grupo en la base de datos
             const { data: inboxCreate, error: errorCreateInbox } = await supabase
                 .rpc('create_inbox', { user_id1, user_id2, user_id3, user_id4, is_group: true, title_inbox });
             
-            console.log('inboxCreateGroup ->>> ', inboxCreate, errorCreateInbox)
             if (errorCreateInbox) throw new Error(errorCreateInbox);
 
-            // Validate avatar
-            const { error: avatarError } = (avatar_group?.size > 0) && await supabase.storage.from('avatar_profile').upload(inboxCreate, avatar_group, {
-                cacheControl: '3600',
-                upsert: true,
-                contentType: avatar_group.type
-            });
-            if (avatarError) throw new Error(avatarError);
+            let signedUrl = null;
+            if (file) {
+                // Decodificar el archivo base64
+                const base64Data = file.split(',')[1];
+                const buffer = Buffer.from(base64Data, 'base64');
+                const fileName = `${inboxCreate}`;
 
-            // Obtener la URL-token de la imagen de perfil
-            const signedUrl = (avatar_group?.size > 0) ? await supabase.storage.from('avatar_profile').createSignedUrl(inboxCreate, 1000000).then(res => res.data?.signedUrl) : null;
+                // Subir el archivo decodificado al almacenamiento de Supabase
+                const { data: uploadData, error: uploadError } = await supabase
+                    .storage
+                    .from('avatar_group')
+                    .upload(fileName, buffer, {
+                        cacheControl: '3600',
+                        upsert: true,
+                        contentType: `${type}`,
+                    });
 
-            // subir/guardar el avatar en el inbox correspondiente
-            const { error: errorUpdateInbox } = await supabase.from('inbox').update({ avatar_group: signedUrl || null }).eq('id', inboxCreate);
+                if (uploadError) throw new Error(uploadError.message);
+                console.log(uploadData)
+
+                // Obtener la URL-token de la imagen de perfil
+                const { data: signedUrlData, error: signedUrlError } = await supabase
+                    .storage
+                    .from('avatar_group')
+                    .createSignedUrl(fileName, 1000000);
+
+                if (signedUrlError) throw new Error(signedUrlError);
+
+                signedUrl = signedUrlData.signedUrl;
+            }
+
+            // Subir/guardar el avatar en el inbox correspondiente
+            const { error: errorUpdateInbox } = await supabase
+                .from('inbox')
+                .update({ avatar_group: signedUrl || null })
+                .eq('id', inboxCreate);
+
             if (errorUpdateInbox) throw new Error(errorUpdateInbox);
 
         } else {
@@ -223,8 +244,8 @@ export async function create_inbox({user_id1, user_id2, user_id3, user_id4, cont
         return { error: null };
 
     } catch (error) {
-        console.error('[ ERROR create_inbox ]', error.message);
-        return { error: error.message };
+        console.error('[ ERROR create_inbox ]', error);
+        return { error };
     }
 }
 

@@ -69,6 +69,7 @@ export default function CreateGroup({ idHost }) {
         if (!idHost) return;
 
         const groupName = formData.get('group_name');
+        const file_avatar = formData.get('group_avatar');
 
         const { error } = await create_inbox({
             user_id1: idHost,
@@ -76,11 +77,10 @@ export default function CreateGroup({ idHost }) {
             user_id3: members[1]?.id || null,
             user_id4: members[2]?.id || null,
             is_group: true,
-            avatar_group: fileBase64,
+            avatar_group: { file: fileBase64, type: file_avatar.type },
             title_inbox: groupName
         });
 
-        return;
         if (!error) {
             inputNameRef.current.value = '';
             setEmptyMembers();
