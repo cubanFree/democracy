@@ -163,8 +163,6 @@ export async function create_inbox({user_id1, user_id2, user_id3, user_id4, cont
             .or(`user_emit.eq.${user_id1},user_target.eq.${user_id2}`)
             .or(`user_emit.eq.${user_id2},user_target.eq.${user_id1}`);
 
-        console.log('user_blocked ->>> ', user_blocked, errorBlocked)
-
         if (errorBlocked) throw new Error(errorBlocked);
         if (user_blocked.length > 0) throw new Error('Message could not be sent.')
 

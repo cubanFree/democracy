@@ -17,7 +17,7 @@ import { fetchProfileData } from "@/lib/data";
 import { MdOutlineDelete } from "react-icons/md";
 import { create_inbox } from "@/lib/action";
 
-// ESTADO DE VISIBILIDAD DEL AVATAR
+// ESTADO DE VISIBILIDAD DEL AVATAR y FORMATEO DEL AVATAR a base64 para poder enviarlo al backend
 const handlingFileChange = (event, setAvatar, setFileBase64) => {
     const file = event.target.files[0];
     if (file) {
@@ -54,17 +54,7 @@ export default function CreateGroup({ idHost }) {
         setMembersFound(data)
     }, 500)
 
-    useEffect(() => {
-        if (!openFrame) {
-            setAvatar(null)
-            setEmptyMembers()
-            setMembersFound([])
-            setFileBase64(null);
-        }
-        !openSearch && setMembersFound([])
-
-    }, [openFrame, openSearch, setEmptyMembers, setMembersFound, setAvatar, setFileBase64])
-
+    // CREAR GRUPO
     const handleSubmit = async (formData) => {
         if (!idHost) return;
 
@@ -78,7 +68,7 @@ export default function CreateGroup({ idHost }) {
             user_id4: members[2]?.id || null,
             is_group: true,
             avatar_group: { file: fileBase64, type: file_avatar.type },
-            title_inbox: groupName
+            title_inbox: groupName || null
         });
 
         if (!error) {
@@ -89,6 +79,17 @@ export default function CreateGroup({ idHost }) {
             setFileBase64(null);
         }
     }
+
+    useEffect(() => {
+        if (!openFrame) {
+            setAvatar(null)
+            setEmptyMembers()
+            setMembersFound([])
+            setFileBase64(null);
+        }
+        !openSearch && setMembersFound([])
+
+    }, [openFrame, openSearch, setEmptyMembers, setMembersFound, setAvatar, setFileBase64])
 
     return (
         <main className="flex justify-center items-center p-2 pl-0">
@@ -218,7 +219,7 @@ export default function CreateGroup({ idHost }) {
                                     </div>
 
                                     <DrawerFooter>
-                                        <BtnSendForm text="Create" className={"w-full dark"} />
+                                        <BtnSendForm text="Create" className={"w-full dark"} isDisabled={members?.length < 1} />
                                         <DrawerClose asChild>
                                             <Button 
                                                 variant="outline"

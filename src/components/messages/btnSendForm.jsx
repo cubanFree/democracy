@@ -4,7 +4,7 @@ import { useFormStatus } from 'react-dom';
 
 import { Button } from "../ui/button";
 
-export default function BtnSendForm({ text, className }) {
+export default function BtnSendForm({ text, className, isDisabled }) {
 
     const { pending } = useFormStatus();
 
@@ -12,7 +12,7 @@ export default function BtnSendForm({ text, className }) {
         <Button
             className={className}
             type="submit"
-            disabled={pending}
+            disabled={ isDisabled || pending}
         >
             {text || 'null'}
         </Button>

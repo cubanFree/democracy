@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, memo } from "react";
+import React, { useEffect, memo } from "react";
 import Image from 'next/image';
 import moment from "moment";
 
@@ -38,6 +38,7 @@ const Message = memo(({ message, date, bodyScrollRef, idHost }) => {
                             message.user_id === idHost ? "bg-emerald-900 border border-emerald-900 shadow-lg" : "bg-gray-700 border border-gray-800 shadow-lg"
                         )}
                     >
+                        <span className="w-full">{message.user_id != idHost && message.user_name}</span>
                         <span className="w-full">{message.content}</span>
                         <span className="w-full text-end text-sm text-gray-400">{date}</span>
                     </div>
@@ -107,8 +108,9 @@ export default function ChatBox({ idHost, supabase }) {
     const setDataMessages = useMessages((state) => state.setDataMessages);
 
     // OTHER STATES
-    const bodyScrollRef = useRef(null);
-    const inputRef = useRef(null);
+    const [inputValue, setInputValue] = React.useState('');
+    const bodyScrollRef = React.useRef(null);
+    const inputRef = React.useRef(null);
 
     // ESCUCHANDO REALTIME MENSAJES ENVIADOS EN EL INBOX CORRESPONDIENTE
     useEffect(() => {
@@ -171,18 +173,40 @@ export default function ChatBox({ idHost, supabase }) {
                 isLoadingMessages ? (
                     <SkProfileInbox />
                 ):(
-                    <div className="w-full flex items-start gap-4 p-2">
-                        <Image 
-                            src={inboxOpen?.avatar || '/avatar_default.jpg'}
-                            alt="avatar message"
-                            width={500}
-                            height={500}
-                            priority
-                            className="object-cover w-11 h-11 rounded-xl"
-                        />
-                        <div className="w-full flex justify-between items-start gap-1">
-                            <div className="w-full flex flex-col justify-between">
-                                <span className="text-lg truncate">{inboxOpen?.chat_name}</span>
+                    <div className="w-full flex items-center gap-5 p-2">
+                        {inboxOpen?.is_group && !inboxOpen?.avatar ? (
+                            <div className="flex -space-x-5 mr-2">
+                                {inboxOpen.contacts.map((contact) => (
+                                    <Image
+                                        key={contact.user_id}
+                                        src={contact.avatar_url || '/avatar_default.jpg'}
+                                        alt="avatar contact"
+                                        width={500}
+                                        height={500}
+                                        priority
+                                        className="object-cover w-8 h-8 rounded-full"
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <Image
+                                src={inboxOpen?.avatar || '/avatar_default.jpg'}
+                                alt="avatar message"
+                                width={500}
+                                height={500}
+                                priority
+                                className="object-cover w-11 h-11 rounded-xl"
+                            />
+                        )}
+                         <div className="w-full flex justify-between items-start gap-1">
+                            <div className="flex flex-col justify-between truncate">
+                                <span className="text-lg truncate">
+                                    {inboxOpen?.is_group && !inboxOpen?.chat_name ? (
+                                         `You, ${inboxOpen.contacts.filter(contact => contact.user_id !== idHost).map(contact => contact.user_name).join(', ')}`
+                                    ) : (
+                                        inboxOpen?.chat_name
+                                    )}
+                                </span>
                                 <div className="flex justify-start items-center gap-1 text-sm text-gray-400">
                                     {
                                         (inboxOpen?.status === 'online') ? (
@@ -204,7 +228,9 @@ export default function ChatBox({ idHost, supabase }) {
                                     }
                                 </div>
                             </div>
-                            <span className="w-full text-sm text-gray-400 flex items-start justify-end text-end">{inboxOpen?.lastMessage_time}</span>
+                            <span className="inline-block text-sm text-gray-400 text-end">
+                                {inboxOpen?.lastMessage_time}
+                            </span>
                         </div>
                     </div>
                 )
@@ -256,13 +282,14 @@ export default function ChatBox({ idHost, supabase }) {
                         name="content_text"
                         className="w-full border-0 p-2 h-auto bg-zinc-800"
                         type="text"
-                        placeholder={"reply to " + inboxOpen?.chat_name + "..."}
+                        placeholder={"reply to " + (inboxOpen?.chat_name || "group/chat") + "..."}
                         autoComplete="off"
                         ref={inputRef}
+                        onChange={(e) => setInputValue(e.target.value)}
                         required
                     />
 
-                    <BtnSendForm text={'Send'} className={"rounded-lg md:self-end"} />
+                    <BtnSendForm text={'Send'} className={"rounded-lg md:self-end"} isDisabled={!inputValue} />
                 </form>
             </div>
             {/* <BtnScrollDown bodyScrollRef={bodyScrollRef} /> */}

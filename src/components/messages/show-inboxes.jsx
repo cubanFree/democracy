@@ -22,46 +22,77 @@ const handleOpenInbox = async (item, date, idHost, setInboxOpen, setDataMessages
     }
 
     // Actualiza el estado para abrir el inbox con sus mensajes e INFO
-    const { data: isActive } = await fetchProfileData({ filter: { id: item.contacts[0].user_id }, table: 'users', caseBox: ['status'] });
-    setDataMessages({inbox_id: item.inbox_id});
-    setInboxOpen(
-        {
+    try {
+        const { data: isActive } = await fetchProfileData({ filter: { id: item.contacts[0].user_id }, table: 'users', caseBox: ['status'] });
+        setDataMessages({ inbox_id: item.inbox_id });
+        setInboxOpen({
             inbox_id: item.inbox_id,
-            avatar: item.avatar_group || item.contacts[0].avatar_url,
-            chat_name: item.title_inbox || item.contacts[0].user_name,
+            avatar: item.is_group ? item.avatar_group : item.contacts[0].avatar_url || null,
+            chat_name: item.is_group ? item.title_inbox || null : item.contacts[0].user_name || null,
             is_group: item.is_group,
             contacts: item.contacts,
             lastMessage_time: date,
             status: isActive[0].status
-        }
-    );
+        });
+    } catch (error) {
+        console.error("Error fetching profile data:", error);
+    }
 };
 
 // MEMOIZAMOS LA LISTA DE INBOXES PARA OPTIMIZAR EL RENDER
 const InboxItem = memo(({ item, idHost, date, notificacionesMessages, onClick }) => {
 
     // Extraemos el numero de notificaciones para cada Inbox
-    const get_unread = notificacionesMessages?.filter(inbox => inbox.inbox_id === item.inbox_id) || [];
-    const { unread_total } = get_unread.length ? get_unread[0] : 0;
+    const get_unread = notificacionesMessages?.find(inbox => inbox.inbox_id === item.inbox_id) || {};
+    const unread_total = get_unread.unread_total || 0;
+
+    const renderAvatars = () => {
+        if (item.is_group && !item.avatar_group) {
+            return (
+                <div className="flex -space-x-8 mr-2 md:-space-x-5">
+                    {item.contacts.map((contact, index) => (
+                        <Image 
+                            key={contact.user_id}
+                            src={contact.avatar_url || '/avatar_default.jpg'}
+                            alt={`avatar ${index}`}
+                            width={30}
+                            height={30}
+                            className="object-cover rounded-full w-11 h-11"
+                        />
+                    ))}
+                </div>
+            );
+        }
+        return (
+            <Image 
+                src={item.is_group ? item.avatar_group || '/avatar_default.jpg' : item.contacts[0].avatar_url || '/avatar_default.jpg'}
+                alt="avatar inbox"
+                width={500}
+                height={500}
+                priority
+                className='object-cover rounded-xl w-11 h-11'
+            />
+        );
+    };
 
     return (
         <div 
             key={item.inbox_id}
-            className="w-full border-b border-gray-700 hover:bg-zinc-800 px-2 py-4 flex flex-col gap-2 cursor-default"
+            className="w-full border-b border-gray-700 hover:bg-zinc-800 px-2 py-4 flex justify-center flex-col gap-2 cursor-default"
             onClick={onClick}
         >
-            <div className="w-full flex gap-4 items-center justify-start">
-                <Image 
-                    src={item.is_group ? item.avatar_group || '/avatar_default.jpg' : item.contacts[0].avatar_url || '/avatar_default.jpg'}
-                    alt="avatar inbox"
-                    width={500}
-                    height={500}
-                    priority
-                    className='object-cover rounded-xl w-11 h-11'
-                />
-                <div className="w-full flex flex-col justify-between gap-1 truncate">
-                    <div className="w-full flex justify-between">
-                        <span className="text-lg">{!item.is_group ? item.contacts[0].user_name : item.title_inbox}</span>
+            <div className="w-full flex gap-5 items-center justify-start">
+                {renderAvatars()}
+                <div className="w-full flex flex-col justify-between truncate">
+                    <div className="w-full flex justify-between items-center">
+                        <span className="text-lg truncate">
+                            {!item.is_group 
+                                ? item.contacts[0].user_name 
+                                : item.title_inbox 
+                                    ? item.title_inbox 
+                                    : <span>You, {item.contacts.filter(contact => contact.user_id !== idHost).map(contact => contact.user_name).join(', ')}</span>
+                            }
+                        </span>
                         <span className={ cn("text-sm text-gray-400", unread_total && "text-blue-400") }>{date}</span>
                     </div>
                     <div className="w-full flex justify-between text-sm text-gray-400 truncate">
