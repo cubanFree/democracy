@@ -18,9 +18,10 @@ import { IoCheckmarkDoneOutline } from "react-icons/io5";
 import BtnSendForm from "./btnSendForm";
 import { TbPointFilled } from "react-icons/tb";
 import { SkProfileInbox } from "../skeleton/sk-profile";
+import { fetchProfileData } from "@/lib/data";
 // import BtnScrollDown from "./btn-scrollDown";
 
-const Message = memo(({ message, date, bodyScrollRef, idHost }) => {
+const Message = memo(({ message, date, bodyScrollRef, idHost, is_group }) => {
     return (
         <article
             ref={bodyScrollRef}
@@ -29,42 +30,38 @@ const Message = memo(({ message, date, bodyScrollRef, idHost }) => {
                 message.user_id === idHost ? "justify-end" : "justify-start"
             )}
         >
-
-            {
-                message.is_group ? (
-                    <div
-                        className={cn(
-                            "py-1 px-2 rounded-md max-w-[75%] flex flex-col gap-1 text-gray-200 text-sm",
-                            message.user_id === idHost ? "bg-emerald-900 border border-emerald-900 shadow-lg" : "bg-gray-700 border border-gray-800 shadow-lg"
-                        )}
-                    >
-                        <span className="w-full">{message.user_id != idHost && message.user_name}</span>
-                        <span className="w-full">{message.content}</span>
-                        <span className="w-full text-end text-sm text-gray-400">{date}</span>
-                    </div>
-                ) : (
-                    <span
-                        className={cn(
-                            "py-1 px-2 rounded-md max-w-[75%] flex flex-col text-gray-200 text-sm",
-                            message.user_id === idHost ? "bg-emerald-900 border border-emerald-900 shadow-lg" : "bg-gray-700 border border-gray-800 shadow-lg"
-                        )}
-                    >
-                        <span className="w-full">{message.content}</span>
-                        <div className="w-full justify-end flex gap-1 items-center">
-                            <span className='text-[0.7rem] text-gray-400'>{date}</span>
-                            {
-                                message.user_id === idHost && (
-                                    message.isRead ? (
-                                        <IoCheckmarkDoneOutline size={15} className="text-emerald-500" />
-                                    ) : (
-                                        <IoCheckmarkOutline size={15} />
-                                    )
-                                )
-                            }
-                        </div>
+            <div
+                className={cn(
+                    "p-1 max-w-[75%] flex flex-col text-gray-200 text-sm",
+                    message.user_id === idHost ? "bg-emerald-900 border border-emerald-900 shadow-lg rounded-b-md rounded-tl-md" : "bg-gray-700 border border-gray-800 shadow-lg rounded-b-md rounded-tr-md"
+                )}
+            >
+                {is_group && message.user_id !== idHost && (
+                    <span className="w-full text-gray-400">
+                        {message.user_name || "user deleted"}
                     </span>
-                )
-            }
+                )}
+
+                <span
+                    className={cn(
+                        "w-full rounded-md p-1",
+                        message.user_id === idHost ? "bg-emerald-800" : "bg-gray-600"
+                    )}
+                >
+                    {message.content}
+                </span>
+
+                <div className="w-full justify-end flex gap-1 items-center">
+                    <span className='text-[0.7rem] text-gray-400'>{date}</span>
+                    {message.user_id === idHost && (
+                        message.isRead ? (
+                            <IoCheckmarkDoneOutline size={15} className="text-emerald-500" />
+                        ) : (
+                            <IoCheckmarkOutline size={15} />
+                        )
+                    )}
+                </div>
+            </div>
 
             {/* diseno para Reply un mensaje */}
             {/* <div 
@@ -253,6 +250,7 @@ export default function ChatBox({ idHost, supabase }) {
                                             <Message
                                                 key={item.id}
                                                 message={item}
+                                                is_group={inboxOpen?.is_group}
                                                 date={date}
                                                 bodyScrollRef={bodyScrollRef}
                                                 idHost={idHost}

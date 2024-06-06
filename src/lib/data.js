@@ -138,22 +138,44 @@ export async function fetchInbox() {
 
 // obtener todos los mensajes
 export async function fetchMessages(inbox_id) {
-
     const supabase = createServerActionClient({ cookies });
-    
+
     try {
         if (!inbox_id) throw new Error('Inbox id not found');
 
+        // Obtener todos los mensajes
         const { data, error } = await supabase
             .from('messages')
             .select('*')
             .eq('inbox_id', inbox_id)
-            .order('created_at', { ascending: true })
-    
+            .order('created_at', { ascending: true });
+
         if (error) throw new Error(`Error fetching messages: ${error.message || 'Something went wrong in fetchMessages'}`);
 
-        return { data }
-        
+        // Obtener todos los user_name de cada mensaje y su avatar
+        const messages = await Promise.allSettled(data.map(async (message) => {
+            try {
+                const { data: user, error: userError } = await supabase
+                    .from('users')
+                    .select('user_name, avatar_url')
+                    .eq('id', message.user_id)
+                    .single();
+
+                if (userError || !user) {
+                    return { ...message, user_name: null, avatar_url: null };
+                }
+
+                return { ...message, user_name: user.user_name, avatar_url: user.avatar_url };
+            } catch (error) {
+                return { ...message, user_name: null, avatar_url: null };
+            }
+        }));
+
+        // Filtrar solo los resultados cumplidos y obtener los valores
+        const fulfilledMessages = messages.filter(result => result.status === 'fulfilled').map(result => result.value);
+
+        return { data: fulfilledMessages };
+
     } catch (error) {
         console.error('[ ERROR fetchMessages ]', error);
         return { data: null };
@@ -162,7 +184,6 @@ export async function fetchMessages(inbox_id) {
 
 // obtener la cantidad de inbox sin leer
 export async function fetchInboxesUnread({ user_id }) {
-    
     const supabase = createServerActionClient({ cookies });
 
     try {

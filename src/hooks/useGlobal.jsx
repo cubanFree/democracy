@@ -1,6 +1,6 @@
 'use client';
 
-import { fetchInbox, fetchMessages, fetchMessagesUnread } from '@/lib/data';
+import { fetchInbox, fetchMessages, fetchMessagesUnread, fetchProfileData } from '@/lib/data';
 import { create } from 'zustand';
 
 export const useMessages = create((set, get) => ({
@@ -38,7 +38,17 @@ export const useMessages = create((set, get) => ({
                 // Verifica si el mensaje ya existe para evitar duplicados
                 const messageExists = dataMessages.some((m) => m.id === value.item.id);
                 if (!messageExists) {
-                    set({ dataMessages: [...dataMessages, value.item] });
+                    // Extraer los datos del propietario del nuevo mensaje correspondiente
+                    try {
+                        const { user_id } = value.item;
+                        const { data, error } = await fetchProfileData({ filter: {id: user_id}, table: 'users', caseBox: ['avatar_url', 'user_name'] });
+                        if (error) throw new Error(error.message);
+                        set({ dataMessages: [...dataMessages, {...value.item, user_name: data[0].user_name, avatar_url: data[0].avatar_url}] });
+
+                    } catch (error) {
+                        console.log(error);
+                        set({ dataMessages: [...dataMessages, {...value.item, user_name: null, avatar_url: null}] });
+                    }
                 }
 
             // En caso de que ocurra una actualizacion de un mensaje
