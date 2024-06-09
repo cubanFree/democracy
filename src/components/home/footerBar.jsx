@@ -131,7 +131,7 @@ export default function FooterBar({ idHost }) {
             <ul className="flex h-full justify-center items-center gap-8 lg:mx-[10%]">
                 {
                     allLinks.map((link) => (
-                        <li key={link.name} className="flex justify-center items-center">
+                        <li key={link.name} className="flex justify-center items-center relative">
                             <TooltipProvider>
                                 <Tooltip>
 
@@ -139,19 +139,19 @@ export default function FooterBar({ idHost }) {
                                         <Link 
                                             href={link.path}
                                             className={cn(
-                                                "hover:text-gray-500 relative",
-                                                (pathDefault === link.path ? ' text-gray-500 animate-pulse' : '')
+                                                "hover:text-gray-500",
+                                                (pathDefault === link.path ? ' text-gray-500' : '')
                                             )}
-                                            >
-                                                <link.icon size={link.size} />
-                                                {
-                                                    (link.name === 'messages' && notificationsInboxes > 0) && 
-                                                        <span 
-                                                            className='bg-blue-600 rounded-full px-2 text-[12px] font-bold absolute -top-1'
-                                                            >
-                                                                {notificationsInboxes}
-                                                        </span>
-                                                }
+                                        >
+                                            <link.icon size={link.size} />
+                                            {
+                                                (link.name === 'messages' && notificationsInboxes > 0) && 
+                                                    <span 
+                                                        className='bg-blue-600 rounded-full px-2 text-[12px] text-white font-bold absolute -top-2 -right-2'
+                                                    >
+                                                        {notificationsInboxes}
+                                                    </span>
+                                            }
                                         </Link>
                                     </TooltipTrigger>
 

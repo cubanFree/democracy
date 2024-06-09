@@ -17,6 +17,7 @@ import { IoCheckmarkOutline } from "react-icons/io5";
 import { IoCheckmarkDoneOutline } from "react-icons/io5";
 import BtnSendForm from "./btnSendForm";
 import { TbPointFilled } from "react-icons/tb";
+import { RiErrorWarningLine } from "react-icons/ri";
 import { SkProfileInbox } from "../skeleton/sk-profile";
 import { fetchProfileData } from "@/lib/data";
 // import BtnScrollDown from "./btn-scrollDown";
@@ -30,26 +31,21 @@ const Message = memo(({ message, date, bodyScrollRef, idHost, is_group }) => {
                 message.user_id === idHost ? "justify-end" : "justify-start"
             )}
         >
-            <div
-                className={cn(
-                    "p-1 max-w-[75%] flex flex-col text-gray-200 text-sm",
-                    message.user_id === idHost ? "bg-emerald-900 border border-emerald-900 shadow-lg rounded-b-md rounded-tl-md" : "bg-gray-700 border border-gray-800 shadow-lg rounded-b-md rounded-tr-md"
-                )}
-            >
-                {is_group && message.user_id !== idHost && (
-                    <span className="w-full text-gray-400">
-                        {message.user_name || "user deleted"}
-                    </span>
-                )}
-
-                <span
+            <div className="max-w-[75%] text-sm text-gray-200">
+                <div
                     className={cn(
-                        "w-full rounded-md p-1",
-                        message.user_id === idHost ? "bg-emerald-800" : "bg-gray-600"
+                        "py-1 px-2 flex flex-col",
+                        message.user_id === idHost ? "bg-emerald-900 border border-emerald-900 shadow-lg rounded-b-md rounded-tl-md" : "bg-gray-800 border border-gray-800 shadow-lg rounded-b-md rounded-tr-md"
                     )}
                 >
-                    {message.content}
-                </span>
+                    {is_group && message.user_id !== idHost && (
+                        <span className="w-full flex items-center gap-1 text-gray-400">
+                            {message.user_name || <><RiErrorWarningLine size={15} color="red"/> user deleted</>}
+                        </span>
+                    )}
+
+                    <span className="w-full flex">{message.content}</span>
+                </div>
 
                 <div className="w-full justify-end flex gap-1 items-center">
                     <span className='text-[0.7rem] text-gray-400'>{date}</span>
@@ -160,7 +156,7 @@ export default function ChatBox({ idHost, supabase }) {
     return (
         <div className="w-full h-full grid grid-rows-[1fr_1fr_15fr_1fr] grid-cols-1 relative">
             {/* Opciones de la caja de mensaje */}
-            <div className="w-full h-full flex items-center justify-between border-b-2 border-gray-500 p-2">
+            <div className="w-full h-full flex items-center justify-between border-b border-gray-700 p-2">
                 { dataMessages?.length > 0 && <MdOutlineDelete size={20} /> }
                 <MdOutlineClear className="cursor-pointer" size={20} onClick={() => setInboxOpen(null)}/>
             </div>
@@ -170,7 +166,7 @@ export default function ChatBox({ idHost, supabase }) {
                 isLoadingMessages ? (
                     <SkProfileInbox />
                 ):(
-                    <div className="w-full flex items-center gap-5 p-2">
+                    <div className="w-full flex items-start gap-5 p-2">
                         {inboxOpen?.is_group && !inboxOpen?.avatar ? (
                             <div className="flex -space-x-5 mr-2">
                                 {inboxOpen.contacts.map((contact) => (
@@ -181,7 +177,7 @@ export default function ChatBox({ idHost, supabase }) {
                                         width={500}
                                         height={500}
                                         priority
-                                        className="object-cover w-8 h-8 rounded-full"
+                                        className="object-cover rounded-full w-11 h-11"
                                     />
                                 ))}
                             </div>
@@ -204,26 +200,30 @@ export default function ChatBox({ idHost, supabase }) {
                                         inboxOpen?.chat_name
                                     )}
                                 </span>
-                                <div className="flex justify-start items-center gap-1 text-sm text-gray-400">
-                                    {
-                                        (inboxOpen?.status === 'online') ? (
-                                            <>
-                                            <TbPointFilled className="text-green-500" />
-                                            <span>online</span>
-                                            </>
-                                        ) : (inboxOpen?.status === 'offline') ? (
-                                            <>
-                                            <TbPointFilled className="text-red-500" />
-                                            <span>offline</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                            <TbPointFilled className="text-gray-500" />
-                                            <span>N/A</span>
-                                            </>
-                                        )
-                                    }
-                                </div>
+                                {
+                                    !inboxOpen?.is_group && (
+                                        <div className="flex justify-start items-center gap-1 text-sm text-gray-400">
+                                            {
+                                                (inboxOpen?.status === 'online') ? (
+                                                    <>
+                                                    <TbPointFilled className="text-green-500" />
+                                                    <span>online</span>
+                                                    </>
+                                                ) : (inboxOpen?.status === 'offline') ? (
+                                                    <>
+                                                    <TbPointFilled className="text-red-500" />
+                                                    <span>offline</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                    <TbPointFilled className="text-gray-500" />
+                                                    <span>N/A</span>
+                                                    </>
+                                                )
+                                            }
+                                        </div>
+                                    )
+                                }
                             </div>
                             <span className="inline-block text-sm text-gray-400 text-end">
                                 {inboxOpen?.lastMessage_time}
@@ -234,7 +234,7 @@ export default function ChatBox({ idHost, supabase }) {
             }
 
             {/* Body de la caja de mensaje */}
-            <div className="flex-grow w-full h-full border-y border-gray-600 p-2 overflow-y-auto scroll-custom bg-neutral-900">
+            <div className="flex-grow w-full h-full border-y border-gray-700 p-2 overflow-y-auto scroll-custom bg-sub-origin md:bg-[#0d0f10]">
                 {
                     isLoadingMessages ? (
                         <div className="w-full h-full flex flex-col justify-center items-center">
@@ -278,7 +278,7 @@ export default function ChatBox({ idHost, supabase }) {
                 >
                     <Input
                         name="content_text"
-                        className="w-full border-0 p-2 h-auto bg-zinc-800"
+                        className="w-full border border-gray-700 p-2 h-auto"
                         type="text"
                         placeholder={"reply to " + (inboxOpen?.chat_name || "group/chat") + "..."}
                         autoComplete="off"

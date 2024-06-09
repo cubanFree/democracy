@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+import { cn } from "@/lib/utils";
 
 export default function BtnSignOut() {
 
@@ -31,7 +32,15 @@ export default function BtnSignOut() {
     };
 
     return (
-        <Button onClick={signOut} size="sm" variant="destructive" className="w-full">
+        <Button 
+            onClick={signOut} 
+            size="sm" 
+            disabled={pending}
+            className={cn(
+                "w-full border border-red-500 text-red-500 bg-default",
+                pending && "cursor-not-allowed opacity-50"
+            )}
+        >
             {
                 pending ? 'Please wait...' : 'Sign out'
             }

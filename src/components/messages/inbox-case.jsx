@@ -40,7 +40,7 @@ export default function InboxCase({ idHost }) {
             <div 
                 className={cn(
                     "w-full h-full scroll-custom relative",
-                    inboxOpen ? 'hidden md:flex md:flex-col' : 'flex flex-col'
+                    inboxOpen ? 'hidden md:flex md:flex-col md:rounded-3xl' : 'flex flex-col'
                 )}
             >
                 {
@@ -66,7 +66,7 @@ export default function InboxCase({ idHost }) {
             {/* MENSAJES DEL INBOX SELECCIONADO */}
             <div className={cn(
                     "w-full h-full overflow-hidden",
-                    inboxOpen ? 'md:border-l-2 md:border-gray-500 z-0' : 'hidden'
+                    inboxOpen ? 'z-0 bg-sub-origin rounded-xl md:bg-[#0d0f10] md:rounded-r-xl md:border md:border-gray-700' : 'hidden'
                 )}
             >
                 <ChatBox idHost={idHost} supabase={supabase} />

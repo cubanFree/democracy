@@ -60,7 +60,7 @@ export default function RegisterCard(
           <div className="w-full flex justify-center gap-4">
               <label className="flex justify-center items-center">
                   <Image 
-                      src={avatar}
+                      src={avatar || '/avatar_default.jpg'}
                       alt="Avatar Profile"
                       width={200}
                       height={200}

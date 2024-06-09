@@ -15,21 +15,21 @@ export default function HeaderBar() {
             path: '/home',
             icon: MdOutlineAttachMoney,
             size: 20,
-            value: '1,030'
+            value: 'null'
         },
         {
             name: 'simCoins',
             path: '/home',
             icon: BsCoin,
             size: 20,
-            value: '30'
+            value: 'null'
         },
         {
             name: 'experience',
             path: '/home',
             icon: GiBrain,
             size: 20,
-            value: '14'
+            value: 'null'
         }
     ]
 

@@ -12,6 +12,7 @@ import { toast } from "sonner"
 export default function DesignSendMessage({ idHost, idTarget, user_name }) {
 
     const inputRef = React.useRef(null)
+    const [inputValue, setInputValue] = React.useState('')
     const [loading, setLoading] = React.useState(false)
     
     // function para enviar el mensaje dado
@@ -30,7 +31,7 @@ export default function DesignSendMessage({ idHost, idTarget, user_name }) {
             <DrawerTrigger asChild>
                 <Button variant="default" className="w-full flex justify-center items-center gap-2">
                     <LiaTelegram size={20} />
-                    <span className="font-bold">Message</span>
+                    Message
                 </Button>
             </DrawerTrigger>
 
@@ -49,6 +50,7 @@ export default function DesignSendMessage({ idHost, idTarget, user_name }) {
                                 name="content_text"
                                 type="text"
                                 ref={inputRef}
+                                onChange={(e) => setInputValue(e.target.value)}
                                 placeholder="Enter message"
                                 className="w-full"
                                 required
@@ -61,7 +63,7 @@ export default function DesignSendMessage({ idHost, idTarget, user_name }) {
                                 type="submit"
                                 variant="default"
                                 className="w-full dark"
-                                disabled={loading}
+                                disabled={loading || inputValue === ''}
                                 >
                                     {
                                         loading ? (

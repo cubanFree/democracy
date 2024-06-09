@@ -139,6 +139,7 @@ export default function CreateGroup({ idHost }) {
                                                 placeholder="Group Name"
                                                 className="w-full"
                                                 autoComplete="off"
+                                                required
                                             />
                                             <div className="w-full grid grid-cols-[auto_auto_auto] gap-4 items-center justify-start">
                                                 {

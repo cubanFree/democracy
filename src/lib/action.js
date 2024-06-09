@@ -34,23 +34,28 @@ export async function signupWithPassword(path, formData) {
     const { email, password, avatar, username } = Object.fromEntries(formData);
 
     try {
-        // Validate form data
+        // Validar datos del formulario
         if (!email || !password) throw new Error('Email and password are required');
         if (path === '') throw new Error('Path is required');
 
-        // Validate avatar
-        const { error: avatarError } = (avatar?.size > 0) && await supabase.storage.from('avatar_profile').upload(email, avatar, {
-            cacheControl: '3600',
-            upsert: true,
-            contentType: avatar.type
-        });
-        if (avatarError) throw new Error(avatarError);
+        // Validar avatar
+        let signedUrl = null;
+        if (avatar?.size > 0) {
+            const { error: avatarError } = await supabase.storage.from('avatar_profile').upload(email, avatar, {
+                cacheControl: '3600',
+                upsert: true,
+                contentType: avatar.type
+            });
+            if (avatarError) throw new Error(avatarError.message);
 
-        // Obtener la URL-token de la imagen de perfil
-        const signedUrl = (avatar?.size > 0) ? await supabase.storage.from('avatar_profile').createSignedUrl(email, 1000000).then(res => res.data?.signedUrl) : null;
-        
-        // Sign up
-        const { error } = await supabase.auth.signUp({
+            // Obtener la URL firmada del avatar
+            const { data, error: urlError } = await supabase.storage.from('avatar_profile').createSignedUrl(email, 1000000);
+            if (urlError) throw new Error(urlError.message);
+            signedUrl = data?.signedUrl;
+        }
+
+        // Registrar usuario
+        const { error: signUpError } = await supabase.auth.signUp({
             email,
             password,
             options: {
@@ -60,15 +65,17 @@ export async function signupWithPassword(path, formData) {
                     user_name: username
                 }
             }
-        })
-        if (error) throw new Error(error);
+        });
+        if (signUpError) throw new Error(signUpError.message);
 
         return { error: null };
 
     } catch (error) {
-        // eliminar el avatar del storage si ocurre algun error en la registracion
-        const { error: removeError } = await supabase.storage.from('avatar_profile').remove([email]);
-        if (removeError) console.error('[ ERROR removeAvatar_url ]', removeError.message);
+        // Eliminar el avatar del storage si ocurre algún error en la registración
+        if (avatar?.size > 0) {
+            const { error: removeError } = await supabase.storage.from('avatar_profile').remove([email]);
+            if (removeError) console.error('[ ERROR removeAvatar_url ]', removeError.message);
+        }
 
         console.error('[ ERROR signup ]', error.message);
         return { error: error.message };
@@ -132,10 +139,12 @@ export async function create_message(inbox_id, content_text, contacts_id) { // c
         if (errorCreateMessage) throw new Error(errorCreateMessage);
 
         const preparedContacts = contacts_id.map(async (id) => {
-            await supabase
-                .from('inbox_members')
-                .update({ is_seen: false })
-                .match({ inbox_id, user_id: id, is_seen: true })
+            if (id !== content_text.user_id) {
+                await supabase
+                    .from('inbox_members')
+                    .update({ is_seen: false })
+                    .match({ inbox_id, user_id: id, is_seen: true })
+            };
         });
 
         const results = await Promise.allSettled(preparedContacts);
@@ -149,7 +158,7 @@ export async function create_message(inbox_id, content_text, contacts_id) { // c
     }
 }
 
-export async function create_inbox({user_id1, user_id2, user_id3, user_id4, content_text, avatar_group: { file, type }, is_group = false, title_inbox = null}) {
+export async function create_inbox({user_id1, user_id2, user_id3, user_id4, content_text, avatar_group, is_group = false, title_inbox = null}) {
 
     const supabase = createServerActionClient({ cookies });
 
@@ -184,8 +193,17 @@ export async function create_inbox({user_id1, user_id2, user_id3, user_id4, cont
             
             if (errorCreateInbox) throw new Error(errorCreateInbox);
 
+            console.log('inboxCreate ->>> ', inboxCreate)
+            // Actualizar el estado is_read del host a TRUE (ya que es el creador del grupo)
+            const { error: errorUpdateIsRead } = await supabase
+                .from('inbox_members')
+                .update({ is_seen: true })
+                .match({ inbox_id: inboxCreate, user_id: user_id1, is_seen: false });
+
+            if (errorUpdateIsRead) throw new Error(errorUpdateIsRead.message);
+
             let signedUrl = null;
-            if (file) {
+            if (avatar_group.file) {
                 // Decodificar el archivo base64
                 const base64Data = file.split(',')[1];
                 const buffer = Buffer.from(base64Data, 'base64');
@@ -198,7 +216,7 @@ export async function create_inbox({user_id1, user_id2, user_id3, user_id4, cont
                     .upload(fileName, buffer, {
                         cacheControl: '3600',
                         upsert: true,
-                        contentType: `${type}`,
+                        contentType: `${avatar_group.type}`,
                     });
 
                 if (uploadError) throw new Error(uploadError.message);
@@ -274,6 +292,7 @@ export async function updateMessagesToRead(sender_id, inboxId, host_id, is_group
     try {
         if (!sender_id || !inboxId || !host_id) throw new Error('Missing data.');
 
+        // Actualiza el estado de is_seen del host a TRUE
         const { error } = await supabase
             .from('inbox_members')
             .update({ is_seen: true })
@@ -294,7 +313,6 @@ export async function updateMessagesToRead(sender_id, inboxId, host_id, is_group
 
         } else {
             // EN LOS GRUPOS, chequeamos a cada usuario con el inbox_id si tiene isSeen en TRUE
-            
             // Obtiene todos los miembros del Inbox (grupo)
             const { data: members, error } = await supabase
                 .from('inbox_members')

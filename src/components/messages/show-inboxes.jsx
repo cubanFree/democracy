@@ -13,18 +13,15 @@ import { fetchProfileData } from "@/lib/data";
 
 // ACTUALIZA TODOS LOS MENSAJES DEL LOS CONTACTOS DEL INBOX COMO LEIDOS Y EL ESTADO DE INBOX ABIERTO
 const handleOpenInbox = async (item, date, idHost, setInboxOpen, setDataMessages) => {
-    
-    // Actualizar los mensajes no leidos en la BD como leidos para cada contacto que pertenece al inbox excepto al host
-    try {
-        await updateMessagesToRead(item.contacts[0].user_id, item.inbox_id, idHost, item.is_group);
-    } catch (error) {
-        console.error("Error updating messages to read:", error);
-    }
 
-    // Actualiza el estado para abrir el inbox con sus mensajes e INFO
     try {
+        // Verificar el estado del usuario (online, offline o N/A)
         const { data: isActive } = await fetchProfileData({ filter: { id: item.contacts[0].user_id }, table: 'users', caseBox: ['status'] });
+        
+        // Actualizar la lista de los mensajes del inbox
         setDataMessages({ inbox_id: item.inbox_id });
+
+        // Actualiza el estado para abrir el inbox con sus mensajes e INFO
         setInboxOpen({
             inbox_id: item.inbox_id,
             avatar: item.is_group ? item.avatar_group : item.contacts[0].avatar_url || null,
@@ -32,19 +29,26 @@ const handleOpenInbox = async (item, date, idHost, setInboxOpen, setDataMessages
             is_group: item.is_group,
             contacts: item.contacts,
             lastMessage_time: date,
-            status: isActive[0].status
+            status: item.is_group ? null : isActive[0].status
         });
     } catch (error) {
         console.error("Error fetching profile data:", error);
     }
+    
+    // Actualizar los mensajes no leidos en la BD como leidos para cada contacto que pertenece al inbox excepto al host
+    try {
+        await updateMessagesToRead(item.contacts[0].user_id, item.inbox_id, idHost, item.is_group);
+    } catch (error) {
+        console.error("Error updating messages to read:", error);
+    }
 };
 
 // MEMOIZAMOS LA LISTA DE INBOXES PARA OPTIMIZAR EL RENDER
-const InboxItem = memo(({ item, idHost, date, notificacionesMessages, onClick }) => {
+const InboxItem = memo(({ item, idHost, date, notificacionesMessages, notificationsInboxes, onClick }) => {
 
     // Extraemos el numero de notificaciones para cada Inbox
     const get_unread = notificacionesMessages?.find(inbox => inbox.inbox_id === item.inbox_id) || {};
-    const unread_total = get_unread.unread_total || 0;
+    const unread_total = (item.is_group && !notificationsInboxes) ? 0 : get_unread.unread_total || 0;
 
     const renderAvatars = () => {
         if (item.is_group && !item.avatar_group) {
@@ -78,7 +82,7 @@ const InboxItem = memo(({ item, idHost, date, notificacionesMessages, onClick })
     return (
         <div 
             key={item.inbox_id}
-            className="w-full border-b border-gray-700 hover:bg-zinc-800 px-2 py-4 flex justify-center flex-col gap-2 cursor-default"
+            className="w-full border-b border-gray-800 hover:bg-zinc-800 px-2 py-4 flex justify-center flex-col gap-2 cursor-default"
             onClick={onClick}
         >
             <div className="w-full flex gap-5 items-center justify-start">
@@ -127,6 +131,7 @@ export default function ShowInboxes({ idHost, supabase, inputRef }) {
     const dataInboxes = useMessages((state) => state.dataInboxes)
     const dataSearch = useMessages((state) => state.dataSearch)
     const notificacionesMessages = useMessages((state) => state.notificacionesMessages)
+    const notificationsInboxes = useMessages((state) => state.notificationsInboxes)
     const inboxOpen = useMessages((state) => state.inboxOpen)
 
     // SET
@@ -165,7 +170,8 @@ export default function ShowInboxes({ idHost, supabase, inputRef }) {
         return () => supabase.removeChannel(channel);
     }, [idHost, supabase]);
 
-    if (!dataInboxes?.length || (inputRef.current?.value && !dataSearch?.length)) { // En caso de que no existan inboxes
+    // En caso de que no existan inboxes
+    if (!dataInboxes?.length || (inputRef.current?.value && !dataSearch?.length)) {
         return (
             <div className="w-full h-full flex flex-col justify-center items-center">
                 <RiCloudOffLine className="text-gray-600 animate-pulse" size={40} />
@@ -186,6 +192,7 @@ export default function ShowInboxes({ idHost, supabase, inputRef }) {
                             idHost={idHost}
                             date={date}
                             item={item}
+                            notificationsInboxes={notificationsInboxes}
                             notificacionesMessages={notificacionesMessages}
                             onClick={() => inboxOpen && inboxOpen.inbox_id === item.inbox_id ? {} : handleOpenInbox(item, completeDate, idHost, setInboxOpen, setDataMessages)}
                         />

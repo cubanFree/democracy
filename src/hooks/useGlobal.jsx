@@ -12,16 +12,35 @@ export const useMessages = create((set, get) => ({
     dataInboxes: [],
     dataSearch: [],
     dataMessages: [],
+
+    // Funcion para actualizar la lista de Inboxes
     setDataInboxes: async () => {
         const { data } = await fetchInbox();
         set({ dataInboxes: data?.sort((a, b) => new Date(b.lastMessage?.created_at).getTime() - new Date(a.lastMessage?.created_at).getTime()) });
         set((state) => ({ ...state, isLoadingInboxes: false }));
     },
+
+    // Funcion para la barra de busqueda de Inboxes
     setDataSearch: (value) => {
         const { dataInboxes } = get();
-        const search = dataInboxes?.filter(item => item.contacts[0].user_name.toLowerCase().includes(value.toLowerCase())) || [];
-        set({ dataSearch: search });
+        const lowerCaseValue = value.toLowerCase();
+
+        // Filtrar por user_name
+        let search = dataInboxes?.filter(item => 
+            item.contacts[0].user_name.toLowerCase().includes(lowerCaseValue)
+        );
+
+        // Si no hay resultados, filtrar por title_inbox
+        if (search.length === 0) {
+            search = dataInboxes?.filter(item => 
+                item.title_inbox?.toLowerCase().includes(lowerCaseValue)
+            );
+        }
+
+        set({ dataSearch: search || [] });
     },
+
+    // Funcion para actualizar la lista de Mensajes
     setDataMessages: async ({ value = {}, inbox_id = null }) => {
         const { dataMessages } = get();
 
@@ -64,6 +83,8 @@ export const useMessages = create((set, get) => ({
         }
         
     },
+
+    // Funcione para actualizar el ultimo mensaje de un Inbox
     setNewMessagesInboxes: ({ inbox_id, lastMessage }) => {
         const { dataInboxes } = get();
         if (!dataInboxes.length) return;
@@ -77,8 +98,14 @@ export const useMessages = create((set, get) => ({
 
         set({dataInboxes: updateDataInboxes});
     },
+
+    // Funcione para actualizar el estado del Inbox seleccionado (abierto o cerrado)
     setInboxOpen: (value) => set({ inboxOpen: value }),
+
+    // Funcione para actualizar el estado de las notificaciones de los Inboxes (cantidad de Inboxes sin leer)
     setNotificationsInboxes: (value) => set({ notificationsInboxes: value }),
+
+    // Funcione para actualizar el estado de las notificaciones de los Mensajes (cantidad de Mensajes sin leer para cada Inbox)
     setNotificationsMessages: async (host_id) => {
         const loadingData = get().isLoadingInboxes;
 
@@ -92,6 +119,8 @@ export const useMessages = create((set, get) => ({
 
 export const useCreateGroup = create((set, get) => ({
     members: [],
+
+    // Funcion para agregar un nuevo contacto
     setAddMember: (value) => {
         const { members } = get();
 
@@ -100,6 +129,8 @@ export const useCreateGroup = create((set, get) => ({
             set({ members: [...members, value] });
         }
     },
+
+    // Funcion para remover un contacto
     setRemoveMember: (value) => {
         const { members } = get();
 
@@ -108,5 +139,7 @@ export const useCreateGroup = create((set, get) => ({
             set({ members: members.filter(member => member.id !== value) });
         }
     },
+
+    // Funcion para limpiar los contactos
     setEmptyMembers: () => set({ members: [] }),
 }))

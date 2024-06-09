@@ -27,7 +27,7 @@ import { toast } from "sonner"
 export default function FormAuth() {
 
     // estados de register card
-    const [avatar, setAvatar] = React.useState('/avatar_default.jpg')
+    const [avatar, setAvatar] = React.useState(null)
     const [isValidData, setIsValidData] = React.useState(false)
     const refCheckbox = React.useRef(null)
     const refInputName = React.useRef(null)
@@ -59,7 +59,7 @@ export default function FormAuth() {
         setIsVisibleEmail('')
         setIsVisiblePass('')
         showPass && setShowPass(false)
-        setAvatar('/avatar_default.jpg')
+        setAvatar(null)
         setIsChecked(false)
         setIsValidData(false)
         refCheckbox.current?.setAttribute('data-state', 'unchecked')
