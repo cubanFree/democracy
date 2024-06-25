@@ -6,6 +6,7 @@ import { MdOutlineAttachMoney } from "react-icons/md";
 import { BsCoin } from "react-icons/bs";
 import { GiBrain } from "react-icons/gi";
 import MenuDesign from "./menuDesign";
+import SearchBar from "../search/search-bar";
 
 export default function HeaderBar() {
 
@@ -15,48 +16,59 @@ export default function HeaderBar() {
             path: '/home',
             icon: MdOutlineAttachMoney,
             size: 20,
-            value: 'null'
+            value: '-'
         },
         {
             name: 'simCoins',
             path: '/home',
             icon: BsCoin,
             size: 20,
-            value: 'null'
+            value: '-'
         },
         {
             name: 'experience',
             path: '/home',
             icon: GiBrain,
             size: 20,
-            value: 'null'
+            value: '-'
         }
     ]
 
     return (
         <nav className="w-full h-full border-b border-gray-700">
             <ul className="flex h-full justify-between items-center text-md lg:mx-[10%]">
+
+                {/* Menu principal */}
                 <li className="p-2">
                     <MenuDesign />
                 </li>
 
-                <div className="flex justify-center items-center">
+                <li className="flex justify-center items-center gap-2">
+
+                    {/* Barra de busqueda */}
+                    <SearchBar />
+
+                    <div className="flex h-1/2 border-x border-gray-700 sm:hidden"/>
+
+                    {/* Propiedades personales */}
                     {
                         allLinks.map((link, index) => (
-                            <li key={index} className="py-1 px-2 hover:bg-gray-800">
-                                <Link href={link.path} className="flex justify-center items-center gap-1">
+                            <div key={index} className="p-2">
+                                <Link href={link.path} className="flex justify-center items-center gap-1 hover:text-gray-500">
                                     <link.icon size={link.size} />
                                     <strong>{link.value}</strong>
                                 </Link>
-                            </li>
+                            </div>
                         ))
                     }
-                    <li className="p-2">
+
+                    {/* Perfil de usuario */}
+                    <div className="p-2">
                         <Suspense fallback={<Skeleton className="h-8 w-8 rounded-lg py-2 px-4 dark" />}>
                             <ProfileDesign />
                         </Suspense>
-                    </li>
-                </div>
+                    </div>
+                </li>
 
             </ul>
         </nav>

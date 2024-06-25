@@ -5,8 +5,10 @@ import { Input } from "../ui/input";
 import { FiSearch } from "react-icons/fi";
 import FiltersBar from "./filters-bar";
 import { useDebouncedCallback } from 'use-debounce';
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Button } from "../ui/button";
 
-export default function SearchBar({ setData = () => {} }) {
+export default function SearchBar() {
 
     // ref del input
     const inputRef = React.useRef(null)
@@ -14,6 +16,8 @@ export default function SearchBar({ setData = () => {} }) {
     // estados filter y search
     const [filter, setFilter] = React.useState('company_name')
     const [search, setSearch] = React.useState('')
+    const [data, setData] = React.useState([])
+    const [openSearch, setOpenSearch] = React.useState(false)
 
     // estado de busqueda
     const resault = useDebouncedCallback(async (value) => {
@@ -33,41 +37,57 @@ export default function SearchBar({ setData = () => {} }) {
     }
 
     return (
-        <main className="w-full flex flex-col gap-2">
+        <>
+        <label
+            className="hidden items-center w-96 h-7 gap-2 justify-start border border-gray-700 px-2 rounded-md text-gray-400 sm:flex"
+        >
+            <FiSearch size={20}/>
+            <Input 
+                type="text"
+                ref={inputRef}
+                placeholder={filter}
+                onChange={(e) => resault(e.target.value)}
+                className="flex w-full h-full border-0 p-0"
+            />
+            {
+                search && (
+                    <span 
+                        className="text-blue-400 flex items-center justify-center cursor-pointer text-sm"
+                        onClick={cancelSearch}
+                        >
+                            cancel
+                    </span>
+                )
+            }
+            <FiltersBar onFilter={setFilter} />
+        </label>
 
-            <div className="w-full flex justify-start items-center gap-2">
-                <form
-                    action=''
-                    className="w-full"
-                    >
-                        <label
-                            className="w-full flex gap-4 justify-start items-center border border-gray-700 px-2 rounded-md"
-                            >
-                                <FiSearch />
-                                <Input 
-                                    type="text"
-                                    ref={inputRef}
-                                    placeholder="search quickly..."
-                                    onChange={(e) => resault(e.target.value)}
-                                    className="w-full border-0 p-0"
-                                />
-                        </label>
-                </form>
-
+        <Popover>
+            <PopoverTrigger asChild className="sm:hidden flex">
+                <Button className="p-0 bg-origin"><FiSearch size={20}/></Button>
+            </PopoverTrigger>
+            <PopoverContent className="flex items-center w-screen h-7 gap-2 justify-start border-2 border-yellow-700 px-2 rounded-md text-gray-400 bg-origin">
+                <FiSearch size={20}/>
+                <Input 
+                    type="text"
+                    ref={inputRef}
+                    placeholder={filter}
+                    onChange={(e) => resault(e.target.value)}
+                    className="flex w-full h-full border-0"
+                />
                 {
                     search && (
                         <span 
-                            className="text-blue-400 flex items-center justify-center cursor-pointer"
+                            className="text-blue-400 flex items-center justify-center cursor-pointer text-sm"
                             onClick={cancelSearch}
                             >
                                 cancel
                         </span>
                     )
                 }
-            </div>
-
-            <FiltersBar setFilter={setFilter} filter={filter} />
-
-        </main>
+                <FiltersBar onFilter={setFilter} />
+            </PopoverContent>
+        </Popover>
+        </>
     )
 }

@@ -28,6 +28,7 @@ export default async function ProfileDesign() {
             size: 20
         }
     ]
+    console.log(data)
 
     return (
         <DropdownMenu>

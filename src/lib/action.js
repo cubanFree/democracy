@@ -49,7 +49,10 @@ export async function signupWithPassword(path, formData) {
             if (avatarError) throw new Error(avatarError.message);
 
             // Obtener la URL firmada del avatar
-            const { data, error: urlError } = await supabase.storage.from('avatar_profile').createSignedUrl(email, 1000000);
+            const { data, error: urlError } = await supabase.storage
+                .from('avatar_profile')
+                .createSignedUrl(email, 31536000);
+                
             if (urlError) throw new Error(urlError.message);
             signedUrl = data?.signedUrl;
         }
@@ -226,7 +229,7 @@ export async function create_inbox({user_id1, user_id2, user_id3, user_id4, cont
                 const { data: signedUrlData, error: signedUrlError } = await supabase
                     .storage
                     .from('avatar_group')
-                    .createSignedUrl(fileName, 1000000);
+                    .createSignedUrl(fileName, 31536000);
 
                 if (signedUrlError) throw new Error(signedUrlError);
 

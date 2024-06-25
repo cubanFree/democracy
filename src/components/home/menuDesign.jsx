@@ -7,7 +7,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MdOutlineExpandMore } from "react-icons/md";
-import { RiExpandLeftRightLine } from "react-icons/ri";
+import { IoIosMenu } from "react-icons/io";
 import React from "react";
 import Link from "next/link";
 import { LuLibrary } from "react-icons/lu";
@@ -65,7 +65,7 @@ export default function MenuDesign() {
                 {
                     open
                         ? <MdOutlineExpandMore size={30} className="animate-pulse"/>
-                        : <RiExpandLeftRightLine size={30}/>
+                        : <IoIosMenu size={30}/>
                 }
             </DropdownMenuTrigger>
 

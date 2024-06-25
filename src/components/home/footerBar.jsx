@@ -3,8 +3,6 @@
 import Link from 'next/link'
 import { HiOutlineMap } from "react-icons/hi2";
 import { LuWarehouse } from "react-icons/lu";
-import { TbArrowsExchange2 } from "react-icons/tb";
-import { FiSearch } from "react-icons/fi";
 import { BiMessageSquareDetail } from "react-icons/bi";
 import React, { useEffect } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
@@ -14,6 +12,21 @@ import { handleMessageReceived } from '@/lib/action';
 import { fetchInboxesUnread } from '@/lib/data';
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useMessages } from '@/hooks/useGlobal';
+import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
+import SideBar from '../general/side-bar';
+import { HiOutlineMenuAlt2 } from "react-icons/hi";
+import { GoGitCompare } from "react-icons/go";
+import { MdOutlineSummarize, MdOutlineAccountBalanceWallet } from "react-icons/md";
+import { FaUserTie } from "react-icons/fa";
+import { AiOutlineStock } from "react-icons/ai";
+import { BsCoin } from "react-icons/bs";
+import { MdOutlineRealEstateAgent } from "react-icons/md";
+import { LuListStart, LuListEnd } from "react-icons/lu";
+import { TbListSearch } from "react-icons/tb";
+import { RiGitRepositoryLine } from "react-icons/ri";
+import { CiInboxIn } from "react-icons/ci";
+import { IoEarthOutline } from "react-icons/io5";
+import { TbHomeLink } from "react-icons/tb";
 
 // ACTUALIZAMOS EL ESTADO DE LECTURA DE LOS INBOXES Y MENSAJES DEPENDIENDO SI EL INBOX ESTA ABIERTO O NO
 const updateDataInbox = async (message, idHost, isInboxOpen) => {
@@ -43,11 +56,12 @@ export default function FooterBar({ idHost }) {
     const supabase = createClientComponentClient();
     const pathDefault = usePathname();
 
-    // escuchando nuevos mensajes Realtime
+    // Escuchando nuevos mensajes Realtime
     useEffect(() => {
         getCountInboxesUnread({ user_id: idHost, setNotificationsInboxes });
     }, [idHost, setNotificationsInboxes]);
 
+    // Escuchando cambio de ruta para cerrar el inbox
     useEffect(() => {
         if (pathDefault !== '/messages/inbox') {
             setInboxOpen(null);
@@ -107,12 +121,6 @@ export default function FooterBar({ idHost }) {
             size: 25
         },
         {
-            name: 'search',
-            path: '/search',
-            icon: FiSearch,
-            size: 25
-        },
-        {
             name: 'messages',
             path: '/messages/inbox',
             icon: BiMessageSquareDetail,
@@ -121,10 +129,30 @@ export default function FooterBar({ idHost }) {
         {
             name: 'stock',
             path: '/stock',
-            icon: TbArrowsExchange2,
-            size: 30
+            icon: GoGitCompare,
+            size: 25
         }
     ]
+
+    const listMenu = {
+        warehouse: [
+            { name: 'Summaries', href: '/warehouse/summaries', icon: MdOutlineSummarize, size: 25 },
+            { name: 'Accounting', href: '/warehouse/accounting', icon: MdOutlineAccountBalanceWallet, size: 25 },
+            { name: 'Directors', href: '/warehouse/directors', icon: FaUserTie, size: 25 },
+            { name: 'Finance', href: '/warehouse/finance', icon: AiOutlineStock, size: 25 },
+            { name: 'SimCoin', href: '/warehouse/simcoin', icon: BsCoin, size: 25 },
+            { name: 'Goods', href: '/warehouse/goods', icon: MdOutlineRealEstateAgent, size: 25 },
+            { name: 'Starters', href: '/warehouse/starters', icon: LuListStart, size: 25 },
+            { name: 'Outgoing', href: '/warehouse/outgoing', icon: LuListEnd, size: 25 },
+            { name: 'Statistics', href: '/warehouse/statistics', icon: TbListSearch, size: 25 },
+            { name: 'Investigation', href: '/warehouse/investigation', icon: RiGitRepositoryLine, size: 25 }
+        ],
+        messages: [
+            { name: 'Inbox', href: '/messages/inbox', icon: CiInboxIn, size: 25, notifications: notificationsInboxes },
+            { name: 'Social', href: '/messages/social', icon: IoEarthOutline, size: 25, notifications: 0 },
+            { name: 'My country', href: '/messages/my-country', icon: TbHomeLink, size: 25, notifications: 0 }
+        ]
+    };
 
     return (
         <nav className="w-full h-full border-t border-gray-700">
@@ -136,23 +164,23 @@ export default function FooterBar({ idHost }) {
                                 <Tooltip>
 
                                     <TooltipTrigger>
-                                        <Link 
-                                            href={link.path}
-                                            className={cn(
-                                                "hover:text-gray-500",
-                                                (pathDefault === link.path ? ' text-gray-500' : '')
-                                            )}
-                                        >
-                                            <link.icon size={link.size} />
-                                            {
-                                                (link.name === 'messages' && notificationsInboxes > 0) && 
-                                                    <span 
-                                                        className='bg-blue-600 rounded-full px-2 text-[12px] text-white font-bold absolute -top-2 -right-2'
-                                                    >
-                                                        {notificationsInboxes}
-                                                    </span>
-                                            }
-                                        </Link>
+                                    <Link 
+                                        href={link.path}
+                                        className={cn(
+                                            "hover:text-gray-500",
+                                            (pathDefault.split('/')[1] === link.path.split('/')[1] ? ' text-gray-500' : '')
+                                        )}
+                                    >
+                                        <link.icon size={link.size} />
+                                        {
+                                            (link.name === 'messages' && notificationsInboxes > 0) && 
+                                                <span 
+                                                    className='bg-blue-600 rounded-full px-2 text-[12px] text-white font-bold absolute -top-2 -right-2'
+                                                >
+                                                    {notificationsInboxes}
+                                                </span>
+                                        }
+                                    </Link>
                                     </TooltipTrigger>
 
                                     <TooltipContent>
@@ -163,6 +191,27 @@ export default function FooterBar({ idHost }) {
                             </TooltipProvider>
                         </li>
                     ))
+                }
+
+                {
+                    listMenu[pathDefault.split('/')[1]] 
+                        ? (
+                            <>
+                            <div className="h-1/2 border-x border-gray-700 md:hidden"/>
+
+                            <div className="flex items-center md:hidden">
+                                <Sheet>
+                                    <SheetTrigger><HiOutlineMenuAlt2 size={25}/></SheetTrigger>
+                                    <SheetContent className="bg-card w-[15rem] overflow-y-auto text-gray-300">
+                                        <SideBar 
+                                            className='flex justify-start flex-col gap-2'
+                                            pathList={listMenu[pathDefault.split('/')[1]]}
+                                        />
+                                    </SheetContent>
+                                </Sheet>
+                            </div>
+                            </>
+                        ) : null
                 }
             </ul>
         </nav>

@@ -19,7 +19,6 @@ import BtnSendForm from "./btnSendForm";
 import { TbPointFilled } from "react-icons/tb";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { SkProfileInbox } from "../skeleton/sk-profile";
-import { fetchProfileData } from "@/lib/data";
 // import BtnScrollDown from "./btn-scrollDown";
 
 const Message = memo(({ message, date, bodyScrollRef, idHost, is_group }) => {

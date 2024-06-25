@@ -23,7 +23,7 @@ export default function SideBar({ pathList = [], className }) {
                             key={index}
                             href={path.href}
                             className={cn(
-                                'flex justify-start items-center gap-2 p-3 md:cursor-pointer md:hover:bg-foreground md:hover:text-background md:justify-center lg:justify-start',
+                                'flex justify-start items-center gap-2 p-2 md:cursor-pointer md:hover:bg-foreground md:hover:text-background md:justify-center lg:justify-start',
                                 pathname === path.href ? 'text-blue-300' : '',
                                 )}
                             >
